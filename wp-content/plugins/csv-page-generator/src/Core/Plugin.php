@@ -186,7 +186,7 @@ class Plugin {
 
 		wp_enqueue_style(
 			'csv-page-generator-admin',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/dist/css/admin-style.css',
+			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/css/admin.css',
 			array(),
 			$this->version,
 			'all'
@@ -206,7 +206,7 @@ class Plugin {
 
 		wp_enqueue_script(
 			'csv-page-generator-admin',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/dist/js/admin.js',
+			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/js/admin.js',
 			array( 'jquery' ),
 			$this->version,
 			true
@@ -218,7 +218,8 @@ class Plugin {
 			'csvPageGenerator',
 			array(
 				'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
-				'nonce'      => $this->nonce_manager->create_nonce( 'csv_page_generator_admin' ),
+				'uploadNonce' => $this->nonce_manager->create_nonce( 'csv_page_generator_upload' ),
+				'progressNonce' => $this->nonce_manager->create_nonce( 'csv_page_generator_progress' ),
 				'strings'    => array(
 					'uploading'     => __( 'Uploading...', 'csv-page-generator' ),
 					'processing'    => __( 'Processing...', 'csv-page-generator' ),

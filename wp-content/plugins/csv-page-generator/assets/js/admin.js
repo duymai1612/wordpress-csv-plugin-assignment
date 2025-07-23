@@ -140,7 +140,6 @@
             // Prepare form data
             const formData = new FormData(form[0]);
             formData.append('action', 'csv_page_generator_upload');
-            formData.append('nonce', csvPageGenerator.nonce);
 
             // Start upload
             this.uploadFile(formData);

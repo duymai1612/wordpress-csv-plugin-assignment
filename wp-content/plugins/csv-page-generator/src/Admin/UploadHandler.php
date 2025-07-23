@@ -89,7 +89,7 @@ class UploadHandler {
 	public function handle_ajax_upload() {
 		try {
 			// Verify nonce
-			if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'csv_page_generator_upload' ) ) {
+			if ( ! wp_verify_nonce( $_POST['csv_upload_nonce'] ?? '', 'csv_page_generator_upload' ) ) {
 				throw new \Exception( __( 'Security verification failed.', 'csv-page-generator' ) );
 			}
 

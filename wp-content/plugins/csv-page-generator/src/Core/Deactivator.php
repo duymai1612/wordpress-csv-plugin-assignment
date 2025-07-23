@@ -66,7 +66,7 @@ class Deactivator {
 		}
 
 		// Clear any import processing cron jobs
-		$import_events = wp_get_scheduled_events();
+		$import_events = \wp_get_scheduled_events();
 		foreach ( $import_events as $timestamp => $events ) {
 			foreach ( $events as $hook => $event_data ) {
 				if ( strpos( $hook, 'csv_page_generator_' ) === 0 ) {
