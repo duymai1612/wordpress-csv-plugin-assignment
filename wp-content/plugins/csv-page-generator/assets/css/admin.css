@@ -345,98 +345,98 @@
 }
 
 /* Import History Styles */
-.csv-history-stats {
-    margin: 20px 0;
+.wrap .csv-history-stats {
+    margin: 20px 0 !important;
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+.wrap .csv-history-stats .stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
+    margin-bottom: 30px !important;
 }
 
-.stat-card {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+.wrap .csv-history-stats .stat-card {
+    background: #fff !important;
+    border: 1px solid #c3c4c7 !important;
+    border-radius: 4px !important;
+    padding: 20px !important;
+    text-align: center !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04) !important;
 }
 
-.stat-card h3 {
-    font-size: 2.5em;
-    margin: 0 0 10px 0;
-    color: #1d2327;
-    font-weight: 600;
+.wrap .csv-history-stats .stat-card h3 {
+    font-size: 2.5em !important;
+    margin: 0 0 10px 0 !important;
+    color: #1d2327 !important;
+    font-weight: 600 !important;
 }
 
-.stat-card p {
-    margin: 0;
-    color: #646970;
-    font-weight: 500;
+.wrap .csv-history-stats .stat-card p {
+    margin: 0 !important;
+    color: #646970 !important;
+    font-weight: 500 !important;
 }
 
-.status-badge {
-    padding: 4px 8px;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
+.wrap .status-badge {
+    padding: 4px 8px !important;
+    border-radius: 3px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
 }
 
-.status-completed {
-    background: #d1e7dd;
-    color: #0f5132;
+.wrap .status-completed {
+    background: #d1e7dd !important;
+    color: #0f5132 !important;
 }
 
-.status-pending {
-    background: #fff3cd;
-    color: #664d03;
+.wrap .status-pending {
+    background: #fff3cd !important;
+    color: #664d03 !important;
 }
 
-.status-processing {
-    background: #cff4fc;
-    color: #055160;
+.wrap .status-processing {
+    background: #cff4fc !important;
+    color: #055160 !important;
 }
 
-.status-failed {
-    background: #f8d7da;
-    color: #721c24;
+.wrap .status-failed {
+    background: #f8d7da !important;
+    color: #721c24 !important;
 }
 
-.success-count {
-    color: #0f5132;
-    font-weight: 600;
+.wrap .success-count {
+    color: #0f5132 !important;
+    font-weight: 600 !important;
 }
 
-.failed-count.error {
-    color: #721c24;
-    font-weight: 600;
+.wrap .failed-count.error {
+    color: #721c24 !important;
+    font-weight: 600 !important;
 }
 
-.error-log-details {
-    margin-top: 10px;
-    padding: 10px;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
+.wrap .error-log-details {
+    margin-top: 10px !important;
+    padding: 10px !important;
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
 }
 
-.error-log-details pre {
-    margin: 0;
-    white-space: pre-wrap;
-    font-size: 12px;
-    max-height: 200px;
-    overflow-y: auto;
+.wrap .error-log-details pre {
+    margin: 0 !important;
+    white-space: pre-wrap !important;
+    font-size: 12px !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
 }
 
-.csv-history-table .column-id { width: 60px; }
-.csv-history-table .column-status { width: 100px; }
-.csv-history-table .column-rows { width: 80px; }
-.csv-history-table .column-success { width: 100px; }
-.csv-history-table .column-failed { width: 80px; }
-.csv-history-table .column-size { width: 100px; }
-.csv-history-table .column-date { width: 150px; }
-.csv-history-table .column-actions { width: 150px; }
+.wrap .csv-history-table .column-id { width: 60px !important; }
+.wrap .csv-history-table .column-status { width: 100px !important; }
+.wrap .csv-history-table .column-rows { width: 80px !important; }
+.wrap .csv-history-table .column-success { width: 100px !important; }
+.wrap .csv-history-table .column-failed { width: 80px !important; }
+.wrap .csv-history-table .column-size { width: 100px !important; }
+.wrap .csv-history-table .column-date { width: 150px !important; }
+.wrap .csv-history-table .column-actions { width: 150px !important; }

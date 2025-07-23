@@ -186,7 +186,7 @@ class Plugin {
 
 		wp_enqueue_style(
 			'csv-page-generator-admin',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/css/admin.css',
+			CSV_PAGE_GENERATOR_PLUGIN_URL . 'assets/css/admin.css',
 			array(),
 			$this->version,
 			'all'
@@ -206,7 +206,7 @@ class Plugin {
 
 		wp_enqueue_script(
 			'csv-page-generator-admin',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/js/admin.js',
+			CSV_PAGE_GENERATOR_PLUGIN_URL . 'assets/js/admin.js',
 			array( 'jquery' ),
 			$this->version,
 			true
@@ -268,6 +268,9 @@ class Plugin {
 			'toplevel_page_csv-page-generator',
 			'csv-page-generator_page_csv-page-generator-settings',
 			'csv-page-generator_page_csv-page-generator-history',
+			// WordPress uses menu title for hook suffix, so we need both variations
+			'csv-pages_page_csv-page-generator-settings',
+			'csv-pages_page_csv-page-generator-history',
 		);
 
 		return in_array( $hook_suffix, $our_pages, true );
