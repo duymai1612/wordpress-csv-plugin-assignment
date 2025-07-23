@@ -1,0 +1,35 @@
+name: wordpress-csv-plugin
+type: wordpress
+docroot: ""
+php_version: "8.1"
+webserver_type: nginx-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+additional_hostnames: []
+additional_fqdns: []
+database:
+  type: mysql
+  version: "8.0"
+nfs_mount_enabled: false
+mutagen_enabled: false
+use_dns_when_possible: true
+composer_version: "2"
+web_environment:
+- WORDPRESS_DB_HOST=db
+- WORDPRESS_DB_NAME=db
+- WORDPRESS_DB_USER=db
+- WORDPRESS_DB_PASSWORD=db
+
+# WordPress specific configuration
+wordpress:
+  wp_cli_version: "2.8.1"
+
+# Hooks for WordPress setup
+hooks:
+  post-start:
+    - exec: wp core download --force
+    - exec: wp config create --dbname=db --dbuser=db --dbpass=db --dbhost=db --force
+    - exec: wp core install --url=https://wordpress-csv-plugin.ddev.site --title="WordPress CSV Plugin Development" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
+    - exec: wp plugin activate --all
+    - exec: wp theme activate twentytwentyfour

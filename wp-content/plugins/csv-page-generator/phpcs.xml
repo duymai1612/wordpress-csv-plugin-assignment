@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<ruleset name="CSV Page Generator Coding Standards">
+    <description>Coding standards for CSV Page Generator plugin</description>
+
+    <!-- What to scan -->
+    <file>./src</file>
+    <file>./csv-page-generator.php</file>
+    <file>./uninstall.php</file>
+
+    <!-- How to scan -->
+    <arg value="sp"/> <!-- Show sniff and progress -->
+    <arg name="basepath" value="./"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+
+    <!-- Rules: Check PHP version compatibility -->
+    <config name="testVersion" value="8.1-"/>
+
+    <!-- Rules: WordPress Coding Standards -->
+    <rule ref="WordPress">
+        <!-- Allow short array syntax -->
+        <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+        
+        <!-- Allow short ternary operator -->
+        <exclude name="WordPress.PHP.DisallowShortTernary"/>
+        
+        <!-- Exclude filename rules for main plugin file -->
+        <exclude name="WordPress.Files.FileName"/>
+    </rule>
+
+    <!-- Rules: WordPress Extra -->
+    <rule ref="WordPress-Extra">
+        <!-- Allow short array syntax -->
+        <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+    </rule>
+
+    <!-- Rules: WordPress Docs -->
+    <rule ref="WordPress-Docs"/>
+
+    <!-- Check for PHP cross-version compatibility -->
+    <rule ref="PHPCompatibility"/>
+
+    <!-- Minimum supported WordPress version -->
+    <config name="minimum_supported_wp_version" value="6.0"/>
+
+    <!-- Text domain verification -->
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="csv-page-generator"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Prefix verification -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="csv_page_generator"/>
+                <element value="CSV_PAGE_GENERATOR"/>
+                <element value="ReasonDigital\CSVPageGenerator"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Allow for theme/plugin specific exceptions -->
+    <rule ref="WordPress.Security.EscapeOutput">
+        <properties>
+            <property name="customAutoEscapedFunctions" type="array">
+                <element value="csv_page_generator_escape"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

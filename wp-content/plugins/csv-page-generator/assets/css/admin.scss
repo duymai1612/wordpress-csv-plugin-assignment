@@ -1,0 +1,369 @@
+/**
+ * CSV Page Generator Admin Styles
+ *
+ * @package ReasonDigital\CSVPageGenerator
+ * @author  Reason Digital Developer
+ * @license GPL-2.0-or-later
+ * @link    https://github.com/reason-digital/wordpress-csv-plugin
+ */
+
+/* Variables */
+:root {
+    --csv-primary-color: #0073aa;
+    --csv-success-color: #00a32a;
+    --csv-error-color: #d63638;
+    --csv-warning-color: #dba617;
+    --csv-border-color: #ccd0d4;
+    --csv-background-color: #f6f7f7;
+    --csv-card-background: #ffffff;
+    --csv-text-color: #1d2327;
+    --csv-border-radius: 4px;
+    --csv-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Main admin container */
+.csv-page-generator-admin {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .card {
+        background: var(--csv-card-background);
+        border: 1px solid var(--csv-border-color);
+        border-radius: var(--csv-border-radius);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--csv-box-shadow);
+
+        h2, h3 {
+            margin-top: 0;
+            color: var(--csv-text-color);
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+    }
+}
+
+/* Upload section */
+.upload-section {
+    .csv-file-upload {
+        position: relative;
+        border: 2px dashed var(--csv-border-color);
+        border-radius: var(--csv-border-radius);
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: var(--csv-background-color);
+
+        &:hover,
+        &.drag-over {
+            border-color: var(--csv-primary-color);
+            background: rgba(0, 115, 170, 0.05);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--csv-border-color);
+            border-radius: var(--csv-border-radius);
+            background: var(--csv-card-background);
+        }
+    }
+
+    .file-upload-info {
+        margin-top: 10px;
+
+        .file-selected {
+            color: var(--csv-success-color);
+            font-weight: 500;
+        }
+    }
+
+    .csv-upload-actions {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .spinner {
+            float: none;
+            margin: 0;
+        }
+    }
+}
+
+/* Progress section */
+.progress-section {
+    .progress-bar-container {
+        margin: 15px 0;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 24px;
+        background-color: var(--csv-background-color);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--csv-border-color);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--csv-success-color), #46b450);
+        transition: width 0.3s ease;
+        border-radius: 12px;
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        font-size: 14px;
+        color: var(--csv-text-color);
+
+        .progress-percentage {
+            font-weight: 600;
+        }
+
+        .progress-status {
+            font-style: italic;
+        }
+    }
+
+    .progress-details {
+        margin: 15px 0;
+        padding: 15px;
+        background: var(--csv-background-color);
+        border-radius: var(--csv-border-radius);
+        border: 1px solid var(--csv-border-color);
+
+        p {
+            margin: 5px 0;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .success-count {
+            color: var(--csv-success-color);
+        }
+
+        .error-count {
+            color: var(--csv-error-color);
+        }
+    }
+
+    .progress-actions {
+        margin-top: 15px;
+    }
+}
+
+/* Results section */
+.results-section {
+    .results-summary {
+        margin: 15px 0;
+
+        .results-stats {
+            padding: 15px;
+            background: var(--csv-background-color);
+            border-radius: var(--csv-border-radius);
+            border-left: 4px solid var(--csv-success-color);
+
+            p {
+                margin: 0 0 10px 0;
+                font-weight: 600;
+                color: var(--csv-success-color);
+            }
+
+            ul {
+                margin: 0;
+                padding-left: 20px;
+
+                li {
+                    margin: 5px 0;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
+    .results-actions {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}
+
+/* Help section */
+.help-section {
+    .help-content {
+        h4 {
+            margin: 15px 0 10px 0;
+            color: var(--csv-text-color);
+            font-size: 1em;
+        }
+
+        ul {
+            margin: 0 0 15px 20px;
+
+            li {
+                margin: 5px 0;
+                font-size: 14px;
+
+                strong {
+                    color: var(--csv-primary-color);
+                }
+            }
+        }
+
+        pre {
+            background: var(--csv-background-color);
+            padding: 15px;
+            border-radius: var(--csv-border-radius);
+            border: 1px solid var(--csv-border-color);
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.4;
+
+            code {
+                background: none;
+                padding: 0;
+                font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            }
+        }
+    }
+}
+
+/* Form elements */
+.form-table {
+    th {
+        font-weight: 600;
+        color: var(--csv-text-color);
+    }
+
+    .description {
+        font-size: 13px;
+        color: #646970;
+        margin-top: 5px;
+    }
+}
+
+/* Buttons */
+.button {
+    &.button-primary {
+        background: var(--csv-primary-color);
+        border-color: var(--csv-primary-color);
+
+        &:hover {
+            background: #005a87;
+            border-color: #005a87;
+        }
+    }
+
+    &.button-secondary {
+        &:hover {
+            border-color: var(--csv-primary-color);
+            color: var(--csv-primary-color);
+        }
+    }
+}
+
+/* Notices */
+.notice {
+    &.notice-csv-success {
+        border-left-color: var(--csv-success-color);
+    }
+
+    &.notice-csv-error {
+        border-left-color: var(--csv-error-color);
+    }
+
+    &.notice-csv-warning {
+        border-left-color: var(--csv-warning-color);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .csv-page-generator-admin {
+        .card {
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .progress-text {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+
+        .results-actions,
+        .csv-upload-actions {
+            flex-direction: column;
+            align-items: stretch;
+
+            .button {
+                margin-bottom: 5px;
+            }
+        }
+    }
+}
+
+/* Animation for drag and drop */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.csv-file-upload.drag-over {
+    animation: pulse 1s infinite;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+
+    &.status-success {
+        background-color: var(--csv-success-color);
+    }
+
+    &.status-error {
+        background-color: var(--csv-error-color);
+    }
+
+    &.status-warning {
+        background-color: var(--csv-warning-color);
+    }
+
+    &.status-processing {
+        background-color: var(--csv-primary-color);
+        animation: pulse 1.5s infinite;
+    }
+}

@@ -54,34 +54,83 @@ This document outlines the comprehensive implementation plan for developing a Wo
 ```
 wordpress-csv-plugin/
 ├── .ddev/                          # DDEV configuration
+│   ├── config.yaml
+│   └── docker-compose.override.yaml
 ├── wp-content/
 │   ├── plugins/
 │   │   └── csv-page-generator/     # Main plugin directory
-│   │       ├── src/                # Source code
+│   │       ├── src/                # Source code (PSR-4 autoloaded)
 │   │       │   ├── Admin/          # Admin interface classes
+│   │       │   │   ├── AdminPage.php
+│   │       │   │   ├── UploadHandler.php
+│   │       │   │   └── SettingsPage.php
 │   │       │   ├── Core/           # Core plugin functionality
+│   │       │   │   ├── Plugin.php
+│   │       │   │   ├── Activator.php
+│   │       │   │   ├── Deactivator.php
+│   │       │   │   └── Loader.php
 │   │       │   ├── CSV/            # CSV processing logic
+│   │       │   │   ├── Parser.php
+│   │       │   │   ├── Validator.php
+│   │       │   │   └── Processor.php
 │   │       │   ├── Pages/          # Page generation logic
+│   │       │   │   ├── Generator.php
+│   │       │   │   ├── BatchProcessor.php
+│   │       │   │   └── DuplicateHandler.php
 │   │       │   ├── Auth/           # JWT authentication (bonus)
+│   │       │   │   ├── JWTManager.php
+│   │       │   │   ├── TokenValidator.php
+│   │       │   │   └── AuthMiddleware.php
+│   │       │   ├── Security/       # Security utilities
+│   │       │   │   ├── FileValidator.php
+│   │       │   │   ├── NonceManager.php
+│   │       │   │   └── Sanitizer.php
 │   │       │   └── Utils/          # Utility classes
+│   │       │       ├── Logger.php
+│   │       │       ├── Database.php
+│   │       │       └── FileHandler.php
 │   │       ├── assets/             # Frontend assets
 │   │       │   ├── css/
+│   │       │   │   ├── admin.css
+│   │       │   │   └── frontend.css
 │   │       │   ├── js/
+│   │       │   │   ├── admin.js
+│   │       │   │   └── upload.js
 │   │       │   └── images/
 │   │       ├── templates/          # Template files
+│   │       │   ├── admin/
+│   │       │   │   ├── upload-form.php
+│   │       │   │   ├── import-history.php
+│   │       │   │   └── settings.php
+│   │       │   └── public/
+│   │       │       └── csv-page-template.php
+│   │       ├── languages/          # Translation files
 │   │       ├── tests/              # Unit and integration tests
+│   │       │   ├── Unit/
+│   │       │   ├── Integration/
+│   │       │   └── bootstrap.php
 │   │       ├── vendor/             # Composer dependencies
 │   │       ├── composer.json
 │   │       ├── package.json
 │   │       ├── webpack.config.js
-│   │       └── csv-page-generator.php
+│   │       ├── phpcs.xml           # PHP CodeSniffer config
+│   │       ├── phpunit.xml         # PHPUnit configuration
+│   │       ├── uninstall.php       # Clean uninstall
+│   │       ├── index.php           # Security file
+│   │       └── csv-page-generator.php # Main plugin file
 │   └── themes/
-│       └── twentytwentyfour/       # Modified default theme
+│       └── twentytwentyfour-child/ # Child theme for modifications
+│           ├── style.css
+│           ├── functions.php
+│           ├── page-csv-generated.php
+│           └── index.php
 ├── tests/                          # WordPress core tests
 ├── composer.json                   # Root composer file
 ├── package.json                    # Node dependencies
 ├── phpunit.xml                     # PHPUnit configuration
 ├── .gitignore
+├── .env.example                    # Environment variables template
+├── docker-compose.yml              # Docker setup
 └── README.md
 ```
 
@@ -96,16 +145,23 @@ wordpress-csv-plugin/
 
 ### Phase 1: Foundation Setup (Days 1-2)
 **Tasks:**
-1. Initialize DDEV environment with WordPress
-2. Set up development toolkit (Composer, npm, PHPCS, PHPUnit)
-3. Create plugin boilerplate with proper namespace and autoloading
-4. Implement basic plugin activation/deactivation hooks
-5. Set up CI/CD pipeline foundations
+1. Initialize DDEV environment with WordPress latest version
+2. Set up development toolkit (Composer, npm, PHPCS with WordPress standards, PHPUnit)
+3. Create plugin boilerplate following WordPress Plugin Directory guidelines
+4. Implement proper plugin header with all required fields
+5. Set up PSR-4 autoloading with proper namespace structure
+6. Create plugin activation/deactivation/uninstall hooks
+7. Implement security measures (index.php files, proper file permissions)
+8. Set up version control with proper .gitignore
+9. Configure development environment variables
 
 **Deliverables:**
-- Working DDEV environment
-- Plugin skeleton with PSR-4 autoloading
+- Working DDEV environment with WordPress
+- Plugin skeleton with proper WordPress structure
+- PSR-4 autoloading configuration
+- Basic security implementation
 - Development workflow documentation
+- Git repository with initial commit
 
 ### Phase 2: Core CSV Processing (Days 2-3)
 **Tasks:**
@@ -198,7 +254,35 @@ wordpress-csv-plugin/
 - **Performance Profiling**: Query optimization and memory usage monitoring
 - **Accessibility Testing**: WCAG 2.1 AA compliance verification
 
-## 6. Best Practices Integration
+## 6. WordPress-Specific Best Practices
+
+### Plugin Development Standards
+- **Plugin Header**: Complete plugin header with all required fields (Name, Description, Version, Author, etc.)
+- **Namespace Usage**: Proper PHP namespacing to avoid conflicts (e.g., `ReasonDigital\CSVPageGenerator`)
+- **Hook Naming**: Consistent hook naming with plugin prefix (`csv_page_generator_`)
+- **Database Tables**: Use WordPress table prefix and follow naming conventions
+- **Options API**: Use WordPress Options API for settings storage
+- **Transients API**: Leverage transients for temporary data caching
+- **WP-Cron Integration**: Use WordPress cron for background processing
+- **Internationalization**: Prepare plugin for translation with proper text domains
+
+### WordPress Security Best Practices
+- **Capability Checks**: Use appropriate WordPress capabilities (manage_options, edit_pages)
+- **Nonce Verification**: Implement nonces for all forms and AJAX requests
+- **Data Sanitization**: Use WordPress sanitization functions consistently
+- **Prepared Statements**: Use $wpdb->prepare() for all database queries
+- **File Upload Security**: Validate file types using wp_check_filetype()
+- **User Input Validation**: Validate and sanitize all user inputs
+- **Output Escaping**: Escape all output using appropriate WordPress functions
+
+### WordPress Performance Best Practices
+- **Query Optimization**: Use WP_Query efficiently, avoid get_posts() in loops
+- **Caching Strategy**: Implement object caching and transients appropriately
+- **Asset Loading**: Conditional asset loading based on context
+- **Database Efficiency**: Minimize database queries and use proper indexing
+- **Memory Management**: Monitor memory usage, especially for large file processing
+
+## 7. Best Practices Integration
 
 ### Coding Standards
 - **PSR-12**: PHP coding style guide compliance
@@ -207,18 +291,51 @@ wordpress-csv-plugin/
 - **Naming Conventions**: Clear, descriptive variable and function names
 
 ### Security Implementation
-- **Input Sanitization**: All user inputs sanitized using WordPress functions
-- **Nonce Verification**: CSRF protection for all admin actions
-- **Capability Checks**: Proper user permission validation
-- **Data Validation**: Strict type checking and format validation
-- **SQL Injection Prevention**: Use WordPress prepared statements
+- **Input Sanitization**: All user inputs sanitized using WordPress functions (sanitize_text_field, wp_kses, etc.)
+- **File Upload Security**:
+  - MIME type validation beyond file extension checking
+  - File size limits and virus scanning integration
+  - Secure file storage outside web root
+  - Temporary file cleanup after processing
+- **Nonce Verification**: CSRF protection for all admin actions and AJAX requests
+- **Capability Checks**: Proper user permission validation (manage_options, edit_pages)
+- **Data Validation**:
+  - Strict type checking and format validation
+  - CSV structure validation before processing
+  - Row-level data sanitization and validation
+- **SQL Injection Prevention**: Use WordPress prepared statements exclusively
+- **Information Disclosure Prevention**:
+  - Generic error messages for users
+  - Detailed logging only in debug mode
+  - Proper error handling without stack traces
+- **Rate Limiting**: Prevent abuse of upload functionality
+- **Session Security**: Secure token storage and validation for JWT (bonus)
 
 ### Performance Optimization
-- **Lazy Loading**: Load plugin components only when needed
-- **Caching**: Implement object caching for repeated operations
-- **Database Optimization**: Efficient queries with proper indexing
-- **Asset Minification**: Compressed CSS and JavaScript files
+- **Lazy Loading**: Load plugin components only when needed using WordPress hooks
+- **Background Processing**:
+  - WP-Cron integration for large CSV file processing
+  - Chunked processing to prevent timeouts
+  - Progress tracking with AJAX updates
+- **Caching**:
+  - Object caching for repeated operations
+  - Transient API for temporary data storage
+  - Database query result caching
+- **Database Optimization**:
+  - Efficient queries with proper indexing
+  - Batch inserts for multiple pages
+  - Database transactions for data integrity
+  - Custom table for import tracking (if needed)
+- **Memory Management**:
+  - Stream processing for large CSV files
+  - Memory limit monitoring and warnings
+  - Garbage collection optimization
+- **Asset Optimization**:
+  - Minified and compressed CSS/JavaScript files
+  - Conditional loading based on admin/frontend context
+  - CDN-ready asset structure
 - **Progressive Enhancement**: Core functionality works without JavaScript
+- **Query Optimization**: Use WordPress query optimization techniques and avoid N+1 queries
 
 ### Error Handling & Logging
 - **Graceful Degradation**: Fallback mechanisms for failed operations
@@ -243,11 +360,20 @@ wordpress-csv-plugin/
 ## 7. Technical Specifications
 
 ### CSV File Format Requirements
-- **Supported Formats**: .csv files with UTF-8 encoding
-- **Required Columns**: Title, Description (minimum)
-- **Optional Columns**: Slug, Status, Author, Featured Image
-- **File Size Limits**: Configurable, default 10MB
-- **Row Limits**: Batch processing for files >1000 rows
+- **Supported Formats**: .csv files with UTF-8 encoding (BOM handling included)
+- **Required Columns**: Title, Description (minimum) - case-insensitive header matching
+- **Optional Columns**: Slug, Status, Author, Featured Image URL, Meta Description, Categories
+- **File Size Limits**: Configurable via WordPress settings, default 10MB, max 50MB
+- **Row Limits**: Batch processing for files >500 rows to prevent timeouts
+- **Validation Rules**:
+  - Title: Required, max 255 characters, HTML stripped
+  - Description: Required, max 65535 characters, allowed HTML tags configurable
+  - Slug: Auto-generated if empty, validated for URL safety
+  - Status: Defaults to 'draft', validates against WordPress post statuses
+- **Error Handling**:
+  - Skip invalid rows with detailed logging
+  - Provide downloadable error report
+  - Continue processing valid rows even if some fail
 
 ### Page Generation Rules
 - **Default Status**: Draft mode for all generated pages
@@ -257,11 +383,31 @@ wordpress-csv-plugin/
 - **Taxonomy**: Optional category assignment based on CSV data
 
 ### Admin Interface Requirements
-- **Upload Form**: Drag-and-drop file upload with preview
-- **Progress Tracking**: Real-time import progress with cancel option
-- **Import History**: List of all previous imports with details
-- **Bulk Actions**: Delete, publish, or modify generated pages
-- **Settings Page**: Configuration options and plugin settings
+- **Upload Form**:
+  - Drag-and-drop file upload with visual feedback
+  - CSV format validation before upload
+  - File preview showing first 5 rows for verification
+  - Column mapping interface for flexible CSV formats
+- **Progress Tracking**:
+  - Real-time import progress with percentage and ETA
+  - Cancel/pause option for long-running imports
+  - Background processing status indicator
+  - Email notification option for completion
+- **Import History**:
+  - Paginated list of all previous imports with search/filter
+  - Import details: date, file name, rows processed, success/error counts
+  - Rollback functionality for recent imports
+  - Export functionality for import logs
+- **Bulk Actions**:
+  - Bulk delete, publish, or modify generated pages
+  - Bulk category assignment
+  - Bulk status changes with confirmation dialogs
+- **Settings Page**:
+  - File size and processing limits configuration
+  - Default page status and author settings
+  - Email notification preferences
+  - Security settings (allowed file types, user capabilities)
+  - Performance settings (batch size, memory limits)
 
 ### Theme Integration Specifications
 - **Template Hierarchy**: Custom page templates for CSV-generated content
@@ -330,29 +476,92 @@ main
 - **Import Speed**: Implement background processing for large files
 - **Frontend Performance**: Minimize asset sizes and HTTP requests
 
-## 10. Success Metrics
+## 10. Implementation Priorities
+
+### Must-Have Features (MVP)
+1. **Core CSV Processing**: Secure file upload, parsing, and validation
+2. **Page Generation**: Automated WordPress page creation in draft status
+3. **Basic Admin Interface**: Upload form and import status
+4. **Security Implementation**: Input sanitization, nonces, capability checks
+5. **Error Handling**: Graceful error handling with user feedback
+
+### Should-Have Features
+1. **Advanced Admin Interface**: Import history, bulk actions, settings page
+2. **Theme Integration**: Custom templates for CSV-generated content
+3. **Performance Optimization**: Background processing, progress tracking
+4. **Enhanced Validation**: Column mapping, preview functionality
+5. **Comprehensive Testing**: Unit tests, integration tests
+
+### Could-Have Features
+1. **JWT Authentication**: Token-based page protection (bonus requirement)
+2. **Advanced Features**: Rollback functionality, email notifications
+3. **Enhanced UX**: Drag-and-drop interface, real-time progress
+4. **Internationalization**: Multi-language support
+5. **Advanced Security**: Rate limiting, virus scanning
+
+## 11. Success Metrics
 
 ### Functional Metrics
-- [ ] CSV files successfully parsed and validated
-- [ ] Pages created in WordPress with correct data
-- [ ] Admin interface fully functional and user-friendly
-- [ ] Theme properly displays CSV-generated content
-- [ ] JWT authentication working securely (bonus)
+- [ ] CSV files successfully parsed and validated with detailed error reporting
+- [ ] Pages created in WordPress with correct data mapping and metadata
+- [ ] Admin interface fully functional with intuitive user experience
+- [ ] Theme properly displays CSV-generated content with responsive design
+- [ ] JWT authentication working securely with proper token management (bonus)
+- [ ] Background processing handles large files without timeouts
+- [ ] Import history and rollback functionality working correctly
 
 ### Quality Metrics
-- [ ] >90% unit test coverage
-- [ ] Zero security vulnerabilities detected
-- [ ] WordPress Coding Standards compliance
-- [ ] Performance benchmarks met
-- [ ] Accessibility standards achieved
+- [ ] >90% unit test coverage with comprehensive edge case testing
+- [ ] Zero critical security vulnerabilities detected in security audit
+- [ ] WordPress Coding Standards compliance (100% PHPCS pass rate)
+- [ ] Performance benchmarks met (handles 10,000+ row CSV files)
+- [ ] Accessibility standards achieved (WCAG 2.1 AA compliance)
+- [ ] Cross-browser compatibility verified
+- [ ] WordPress multisite compatibility confirmed
 
 ### Documentation Metrics
-- [ ] Complete API documentation
-- [ ] User guide with examples
-- [ ] Developer setup instructions
-- [ ] Code comments for complex logic
-- [ ] Change log maintained
+- [ ] Complete API documentation with code examples
+- [ ] User guide with step-by-step instructions and screenshots
+- [ ] Developer setup instructions with DDEV configuration
+- [ ] Inline code comments for all complex logic
+- [ ] Change log maintained with semantic versioning
+- [ ] Security documentation with best practices
+- [ ] Performance optimization guide
 
 ---
 
-This implementation plan provides a structured approach to developing a professional-grade WordPress CSV plugin that meets all assignment requirements while demonstrating best practices in software development, security, and code quality. 
+## Summary of Key Improvements
+
+This updated implementation plan incorporates several critical improvements over the original:
+
+### Enhanced Security
+- Comprehensive file upload security measures
+- Detailed input sanitization and validation strategies
+- WordPress-specific security best practices
+- Rate limiting and abuse prevention
+
+### Improved Performance
+- Background processing for large files
+- Memory management and optimization
+- Database query optimization
+- Caching strategies
+
+### Better User Experience
+- Enhanced admin interface with drag-and-drop
+- Real-time progress tracking
+- Column mapping for flexible CSV formats
+- Comprehensive error handling and reporting
+
+### WordPress Best Practices
+- Proper plugin structure following WordPress standards
+- PSR-4 autoloading with WordPress integration
+- Comprehensive hook and filter usage
+- Internationalization support
+
+### Professional Development Practices
+- Comprehensive testing strategy
+- Code quality measures and standards
+- Proper documentation requirements
+- Version control and deployment processes
+
+This implementation plan provides a structured approach to developing a professional-grade WordPress CSV plugin that exceeds the assignment requirements while demonstrating industry best practices in software development, security, and code quality.

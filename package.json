@@ -1,0 +1,37 @@
+{
+  "name": "wordpress-csv-plugin",
+  "version": "1.0.0",
+  "description": "WordPress CSV Plugin Development Environment",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "dev": "webpack --mode=development --watch",
+    "lint:js": "eslint wp-content/plugins/csv-page-generator/assets/js/",
+    "lint:css": "stylelint wp-content/plugins/csv-page-generator/assets/css/",
+    "format": "prettier --write wp-content/plugins/csv-page-generator/assets/"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-loader": "^9.1.0",
+    "css-loader": "^6.8.0",
+    "eslint": "^8.42.0",
+    "eslint-config-wordpress": "^2.0.0",
+    "mini-css-extract-plugin": "^2.7.0",
+    "prettier": "^2.8.0",
+    "sass": "^1.63.0",
+    "sass-loader": "^13.3.0",
+    "stylelint": "^15.7.0",
+    "stylelint-config-wordpress": "^17.0.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "csv",
+    "development"
+  ],
+  "author": "Reason Digital Developer",
+  "license": "GPL-2.0-or-later"
+}
