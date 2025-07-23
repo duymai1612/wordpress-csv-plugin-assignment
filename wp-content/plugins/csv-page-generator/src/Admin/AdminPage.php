@@ -12,6 +12,7 @@ namespace ReasonDigital\CSVPageGenerator\Admin;
 
 use ReasonDigital\CSVPageGenerator\Security\NonceManager;
 use ReasonDigital\CSVPageGenerator\Utils\Logger;
+use ReasonDigital\CSVPageGenerator\Admin\UploadHandler;
 
 /**
  * Handles the admin interface for the CSV Page Generator plugin.
@@ -49,6 +50,13 @@ class AdminPage {
 	private $settings;
 
 	/**
+	 * Upload handler instance.
+	 *
+	 * @var UploadHandler
+	 */
+	private $upload_handler;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string       $version Plugin version.
@@ -60,6 +68,7 @@ class AdminPage {
 		$this->nonce_manager = $nonce_manager;
 		$this->logger = $logger;
 		$this->settings = get_option( 'csv_page_generator_settings', array() );
+		$this->upload_handler = new UploadHandler( $logger );
 	}
 
 	/**
@@ -249,36 +258,14 @@ class AdminPage {
 	 * Handle CSV file upload via AJAX.
 	 */
 	public function handle_csv_upload() {
-		// Verify nonce
-		if ( ! $this->nonce_manager->verify_ajax_nonce( 'csv_upload', 'nonce', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'csv-page-generator' ) ) );
-		}
-
-		// Check user capabilities
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'csv-page-generator' ) ) );
-		}
-
-		// Placeholder for upload handling
-		wp_send_json_success( array( 'message' => __( 'Upload functionality coming soon.', 'csv-page-generator' ) ) );
+		$this->upload_handler->handle_ajax_upload();
 	}
 
 	/**
 	 * Get import progress via AJAX.
 	 */
 	public function get_import_progress() {
-		// Verify nonce
-		if ( ! $this->nonce_manager->verify_ajax_nonce( 'get_progress', 'nonce', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'csv-page-generator' ) ) );
-		}
-
-		// Check user capabilities
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'csv-page-generator' ) ) );
-		}
-
-		// Placeholder for progress tracking
-		wp_send_json_success( array( 'progress' => 0, 'status' => 'idle' ) );
+		$this->upload_handler->get_upload_progress();
 	}
 
 	/**

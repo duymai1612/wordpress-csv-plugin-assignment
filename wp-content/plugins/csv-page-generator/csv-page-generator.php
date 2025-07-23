@@ -93,9 +93,29 @@ if ( file_exists( CSV_PAGE_GENERATOR_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once CSV_PAGE_GENERATOR_PLUGIN_DIR . 'vendor/autoload.php';
 }
 
-// Load the main plugin class
-if ( file_exists( CSV_PAGE_GENERATOR_PLUGIN_DIR . 'src/Core/Plugin.php' ) ) {
-	require_once CSV_PAGE_GENERATOR_PLUGIN_DIR . 'src/Core/Plugin.php';
+// Load required classes manually (since we don't have Composer autoloader yet)
+$required_classes = array(
+	'src/Core/Plugin.php',
+	'src/Core/Loader.php',
+	'src/Core/Activator.php',
+	'src/Core/Deactivator.php',
+	'src/Utils/Logger.php',
+	'src/Security/NonceManager.php',
+	'src/Admin/AdminPage.php',
+	'src/Admin/UploadHandler.php',
+	'src/CSV/Parser.php',
+	'src/CSV/Validator.php',
+	'src/CSV/Processor.php',
+	'src/Pages/Generator.php',
+	'src/Utils/Database.php',
+	'src/Security/FileValidator.php',
+);
+
+foreach ( $required_classes as $class_file ) {
+	$file_path = CSV_PAGE_GENERATOR_PLUGIN_DIR . $class_file;
+	if ( file_exists( $file_path ) ) {
+		require_once $file_path;
+	}
 }
 
 /**
