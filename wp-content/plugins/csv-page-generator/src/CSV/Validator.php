@@ -363,8 +363,16 @@ class Validator {
 	 * @return bool True if title exists.
 	 */
 	private function title_exists( $title ) {
-		$existing_post = get_page_by_title( $title, OBJECT, 'page' );
-		return ! empty( $existing_post );
+		$query = new \WP_Query( array(
+			'post_type'      => 'page',
+			'post_status'    => 'any',
+			'title'          => $title,
+			'posts_per_page' => 1,
+			'no_found_rows'  => true,
+			'fields'         => 'ids',
+		) );
+
+		return $query->have_posts();
 	}
 
 	/**
