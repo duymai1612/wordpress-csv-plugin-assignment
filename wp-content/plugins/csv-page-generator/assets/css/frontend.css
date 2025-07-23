@@ -1,0 +1,274 @@
+/**
+ * Frontend styles for CSV-generated pages
+ * 
+ * Provides clean, professional styling for pages created from CSV imports
+ * with responsive design and accessibility features.
+ */
+
+/* CSV Page Wrapper */
+.csv-page-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Page Header */
+.csv-generated-page .page-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e1e1e1;
+}
+
+.csv-generated-page .page-title {
+    font-size: 2.5em;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    color: #1a1a1a;
+    line-height: 1.2;
+}
+
+.csv-generated-page .page-excerpt {
+    font-size: 1.2em;
+    color: #666;
+    font-style: italic;
+    margin: 15px 0 0 0;
+}
+
+/* Main Content */
+.csv-generated-page .page-content {
+    margin-bottom: 40px;
+    font-size: 1.1em;
+    line-height: 1.7;
+}
+
+.csv-generated-page .page-content p {
+    margin-bottom: 1.5em;
+}
+
+.csv-generated-page .page-content h2,
+.csv-generated-page .page-content h3,
+.csv-generated-page .page-content h4 {
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: #1a1a1a;
+}
+
+/* Page Links */
+.csv-generated-page .page-links {
+    margin: 30px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* CSV Metadata Section */
+.csv-metadata-section {
+    margin: 40px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    overflow: hidden;
+}
+
+.csv-metadata-toggle {
+    width: 100%;
+    padding: 15px 20px;
+    background: #f1f1f1;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.csv-metadata-toggle:hover {
+    background: #e8e8e8;
+}
+
+.csv-metadata-toggle:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: -2px;
+}
+
+.csv-metadata-toggle .toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.8em;
+}
+
+.csv-metadata-toggle[aria-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.csv-metadata-toggle[aria-expanded="true"] .toggle-text::after {
+    content: " Technical Details";
+}
+
+.csv-metadata-toggle[aria-expanded="false"] .toggle-text::after {
+    content: " Technical Details";
+}
+
+.csv-metadata-content {
+    padding: 20px;
+    background: #fff;
+}
+
+.csv-metadata-content h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.3em;
+    color: #1a1a1a;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Metadata Grid */
+.metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.metadata-item {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border-left: 3px solid #0073aa;
+}
+
+.metadata-item strong {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metadata-item span {
+    font-size: 1.1em;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Metadata Actions */
+.metadata-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.metadata-actions .button {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.metadata-actions .button:hover {
+    background: #005a87;
+    color: #fff;
+}
+
+/* Page Footer */
+.csv-generated-page .page-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e1e1;
+}
+
+.csv-generated-page .page-tags {
+    font-size: 0.95em;
+    color: #666;
+}
+
+.csv-generated-page .page-tags strong {
+    margin-right: 10px;
+}
+
+.csv-generated-page .page-tags a {
+    color: #0073aa;
+    text-decoration: none;
+    margin-right: 5px;
+}
+
+.csv-generated-page .page-tags a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .csv-page-wrapper {
+        padding: 15px;
+    }
+    
+    .csv-generated-page .page-title {
+        font-size: 2em;
+    }
+    
+    .csv-generated-page .page-excerpt {
+        font-size: 1.1em;
+    }
+    
+    .metadata-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metadata-actions {
+        flex-direction: column;
+    }
+    
+    .metadata-actions .button {
+        text-align: center;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .csv-metadata-section {
+        display: none;
+    }
+    
+    .csv-page-wrapper {
+        max-width: none;
+        padding: 0;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    .csv-metadata-toggle .toggle-icon,
+    .metadata-actions .button {
+        transition: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .csv-metadata-section {
+        border-color: #000;
+    }
+    
+    .csv-metadata-toggle {
+        border-bottom: 1px solid #000;
+    }
+    
+    .metadata-item {
+        border-left-color: #000;
+    }
+}

@@ -164,6 +164,10 @@ class Plugin {
 
 		// Template filters
 		$this->loader->add_filter( 'template_include', $this, 'load_csv_page_template' );
+
+		// Content filters to prevent unwanted metadata display
+		$this->loader->add_filter( 'the_content', $this, 'filter_csv_page_content', 10 );
+		$this->loader->add_action( 'wp_head', $this, 'add_csv_page_styles' );
 	}
 
 	/**
@@ -236,26 +240,32 @@ class Plugin {
 	 * Enqueue public-facing stylesheets.
 	 */
 	public function enqueue_public_styles() {
-		wp_enqueue_style(
-			'csv-page-generator-public',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/dist/css/frontend-style.css',
-			array(),
-			$this->version,
-			'all'
-		);
+		// Only load on CSV-generated pages
+		if ( is_page() && $this->is_csv_generated_page() ) {
+			wp_enqueue_style(
+				'csv-page-generator-public',
+				CSV_PAGE_GENERATOR_PLUGIN_URL . 'assets/css/frontend.css',
+				array(),
+				$this->version,
+				'all'
+			);
+		}
 	}
 
 	/**
 	 * Enqueue public-facing scripts.
 	 */
 	public function enqueue_public_scripts() {
-		wp_enqueue_script(
-			'csv-page-generator-public',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/dist/js/frontend.js',
-			array( 'jquery' ),
-			$this->version,
-			true
-		);
+		// Only load on CSV-generated pages
+		if ( is_page() && $this->is_csv_generated_page() ) {
+			wp_enqueue_script(
+				'csv-page-generator-public',
+				CSV_PAGE_GENERATOR_PLUGIN_URL . 'assets/js/frontend.js',
+				array( 'jquery' ),
+				$this->version,
+				true
+			);
+		}
 	}
 
 	/**
@@ -306,6 +316,41 @@ class Plugin {
 
 		$csv_generated = get_post_meta( $post->ID, '_csv_page_generator_source', true );
 		return ! empty( $csv_generated );
+	}
+
+	/**
+	 * Filter content for CSV-generated pages to prevent unwanted metadata display.
+	 *
+	 * @param string $content The page content.
+	 * @return string Filtered content.
+	 */
+	public function filter_csv_page_content( $content ) {
+		if ( is_page() && $this->is_csv_generated_page() ) {
+			// Remove any automatically added custom field displays
+			$content = preg_replace( '/<div[^>]*class="[^"]*custom-fields[^"]*"[^>]*>.*?<\/div>/s', '', $content );
+			$content = preg_replace( '/<div[^>]*class="[^"]*meta-data[^"]*"[^>]*>.*?<\/div>/s', '', $content );
+
+			// Remove any CSV-related metadata that might be auto-displayed
+			$content = preg_replace( '/<!--\s*CSV[^>]*-->/i', '', $content );
+		}
+		return $content;
+	}
+
+	/**
+	 * Add inline styles to head for CSV pages to override theme styles.
+	 */
+	public function add_csv_page_styles() {
+		if ( is_page() && $this->is_csv_generated_page() ) {
+			echo '<style type="text/css">
+				/* Hide any theme-generated custom field displays */
+				.custom-fields, .meta-data, .post-meta-fields { display: none !important; }
+
+				/* Ensure clean content display */
+				.csv-generated-page .entry-content > *:not(p):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not(ul):not(ol):not(blockquote):not(img):not(figure):not(div.wp-block-*) {
+					display: none;
+				}
+			</style>';
+		}
 	}
 
 	/**
