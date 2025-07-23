@@ -14,7 +14,10 @@
      * CSV Page Generator Admin Object
      */
     const CSVPageGeneratorAdmin = {
-        
+
+        // Store current import ID for later use
+        currentImportId: null,
+
         /**
          * Initialize the admin functionality
          */
@@ -203,10 +206,18 @@
          * Handle successful upload
          */
         handleUploadSuccess: function(data) {
-            this.updateProgress(100, 'Processing...');
-            
-            // Start processing
-            this.startProcessing(data.import_id);
+            this.updateProgress(100, 'Complete!');
+
+            // Store import ID for later use
+            this.currentImportId = data.import_id;
+
+            // Show real results instead of simulating
+            if (data.results) {
+                this.showResults(data.results);
+            } else {
+                // Fallback to simulation if no results provided
+                this.startProcessing(data.import_id);
+            }
         },
 
         /**
@@ -338,7 +349,14 @@
          * View created pages
          */
         viewCreatedPages: function() {
-            window.open(csvPageGenerator.adminUrl + 'edit.php?post_type=page', '_blank');
+            if (!this.currentImportId) {
+                alert('No import ID available. Please try uploading a CSV file first.');
+                return;
+            }
+
+            // Construct proper URL with import ID filtering using the correct meta key
+            const url = csvPageGenerator.adminUrl + 'edit.php?post_type=page&meta_key=_csv_page_generator_source&meta_value=' + this.currentImportId;
+            window.open(url, '_blank');
         },
 
         /**

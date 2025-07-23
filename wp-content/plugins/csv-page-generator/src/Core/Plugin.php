@@ -218,6 +218,7 @@ class Plugin {
 			'csvPageGenerator',
 			array(
 				'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+				'adminUrl'   => admin_url( '' ), // Fix: Add missing adminUrl
 				'uploadNonce' => $this->nonce_manager->create_nonce( 'csv_page_generator_upload' ),
 				'progressNonce' => $this->nonce_manager->create_nonce( 'csv_page_generator_progress' ),
 				'strings'    => array(
