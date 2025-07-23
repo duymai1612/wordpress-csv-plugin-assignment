@@ -249,10 +249,10 @@
                     progress = 100;
                     clearInterval(interval);
                     this.showResults({
-                        total: 100,
-                        successful: 95,
-                        failed: 5,
-                        created_pages: []
+                        total_rows: 100,
+                        created_pages: 95,
+                        failed_pages: 5,
+                        pages: []
                     });
                 }
                 
@@ -312,13 +312,24 @@
          * Build results HTML
          */
         buildResultsHtml: function(results) {
+            // Debug: Log the results structure to console
+            console.log('Import results data:', results);
+
+            const totalRows = results.total_rows || results.total || 0;
+            const createdPages = results.created_pages || results.successful || 0;
+            const failedPages = results.failed_pages || results.failed || 0;
+            const validRows = results.valid_rows || totalRows;
+            const invalidRows = results.invalid_rows || 0;
+
             return `
                 <div class="results-stats">
                     <p><strong>Import completed successfully!</strong></p>
                     <ul>
-                        <li>Total rows processed: ${results.total}</li>
-                        <li>Pages created successfully: ${results.successful}</li>
-                        <li>Errors encountered: ${results.failed}</li>
+                        <li>Total rows processed: ${totalRows}</li>
+                        <li>Valid rows: ${validRows}</li>
+                        <li>Invalid rows: ${invalidRows}</li>
+                        <li>Pages created successfully: ${createdPages}</li>
+                        <li>Errors encountered: ${failedPages}</li>
                     </ul>
                 </div>
             `;
