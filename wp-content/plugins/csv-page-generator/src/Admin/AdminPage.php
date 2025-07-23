@@ -194,7 +194,7 @@ class AdminPage {
 		}
 
 		// Include the main page template
-		$template_path = plugin_dir_path( dirname( __DIR__ ) ) . 'templates/admin/upload-form.php';
+		$template_path = CSV_PAGE_GENERATOR_PLUGIN_DIR . 'templates/admin/upload-form.php';
 		
 		if ( file_exists( $template_path ) ) {
 			include $template_path;
@@ -215,17 +215,75 @@ class AdminPage {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'csv-page-generator' ) );
 		}
 
+		// Get import history data
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'csv_page_generator_imports';
+
+		// Handle pagination
+		$per_page = 20;
+		$current_page = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
+		$offset = ( $current_page - 1 ) * $per_page;
+
+		// Get total count for pagination
+		$total_items = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
+		$total_pages = ceil( $total_items / $per_page );
+
+		// Get import records with pagination
+		$imports = $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM {$table_name} ORDER BY started_at DESC LIMIT %d OFFSET %d",
+			$per_page,
+			$offset
+		) );
+
 		// Include the history page template
-		$template_path = plugin_dir_path( dirname( __DIR__ ) ) . 'templates/admin/import-history.php';
-		
+		$template_path = CSV_PAGE_GENERATOR_PLUGIN_DIR . 'templates/admin/import-history.php';
+
 		if ( file_exists( $template_path ) ) {
 			include $template_path;
 		} else {
-			echo '<div class="wrap">';
-			echo '<h1>' . esc_html__( 'Import History', 'csv-page-generator' ) . '</h1>';
-			echo '<p>' . esc_html__( 'History template not found.', 'csv-page-generator' ) . '</p>';
-			echo '</div>';
+			// Fallback: display basic history inline
+			$this->display_history_fallback( $imports, $current_page, $total_pages, $total_items );
 		}
+	}
+
+	/**
+	 * Fallback method to display import history when template is missing.
+	 */
+	private function display_history_fallback( $imports, $current_page, $total_pages, $total_items ) {
+		echo '<div class="wrap">';
+		echo '<h1>' . esc_html__( 'Import History', 'csv-page-generator' ) . '</h1>';
+
+		if ( empty( $imports ) ) {
+			echo '<p>' . esc_html__( 'No import records found.', 'csv-page-generator' ) . '</p>';
+		} else {
+			echo '<p>' . sprintf( esc_html__( 'Total imports: %d', 'csv-page-generator' ), $total_items ) . '</p>';
+			echo '<table class="wp-list-table widefat fixed striped">';
+			echo '<thead><tr>';
+			echo '<th>' . esc_html__( 'ID', 'csv-page-generator' ) . '</th>';
+			echo '<th>' . esc_html__( 'Filename', 'csv-page-generator' ) . '</th>';
+			echo '<th>' . esc_html__( 'Status', 'csv-page-generator' ) . '</th>';
+			echo '<th>' . esc_html__( 'Rows', 'csv-page-generator' ) . '</th>';
+			echo '<th>' . esc_html__( 'Success', 'csv-page-generator' ) . '</th>';
+			echo '<th>' . esc_html__( 'Failed', 'csv-page-generator' ) . '</th>';
+			echo '<th>' . esc_html__( 'Date', 'csv-page-generator' ) . '</th>';
+			echo '</tr></thead><tbody>';
+
+			foreach ( $imports as $import ) {
+				echo '<tr>';
+				echo '<td>' . esc_html( $import->id ) . '</td>';
+				echo '<td>' . esc_html( $import->original_filename ) . '</td>';
+				echo '<td><span class="status-' . esc_attr( $import->status ) . '">' . esc_html( ucfirst( $import->status ) ) . '</span></td>';
+				echo '<td>' . esc_html( $import->total_rows ) . '</td>';
+				echo '<td>' . esc_html( $import->successful_rows ) . '</td>';
+				echo '<td>' . esc_html( $import->failed_rows ) . '</td>';
+				echo '<td>' . esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $import->started_at ) ) ) . '</td>';
+				echo '</tr>';
+			}
+
+			echo '</tbody></table>';
+		}
+
+		echo '</div>';
 	}
 
 	/**

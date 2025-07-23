@@ -60,9 +60,9 @@ class Deactivator {
 	 */
 	private static function clear_scheduled_events() {
 		// Clear cleanup cron job
-		$timestamp = wp_next_scheduled( 'csv_page_generator_cleanup' );
+		$timestamp = \wp_next_scheduled( 'csv_page_generator_cleanup' );
 		if ( $timestamp ) {
-			wp_unschedule_event( $timestamp, 'csv_page_generator_cleanup' );
+			\wp_unschedule_event( $timestamp, 'csv_page_generator_cleanup' );
 		}
 
 		// Clear any import processing cron jobs
@@ -70,7 +70,7 @@ class Deactivator {
 		foreach ( $import_events as $timestamp => $events ) {
 			foreach ( $events as $hook => $event_data ) {
 				if ( strpos( $hook, 'csv_page_generator_' ) === 0 ) {
-					wp_unschedule_event( $timestamp, $hook );
+					\wp_unschedule_event( $timestamp, $hook );
 				}
 			}
 		}
