@@ -107,6 +107,7 @@ wp-content/plugins/csv-page-generator/assets/dist/
 wp-content/plugins/csv-page-generator/coverage/
 wp-content/plugins/csv-page-generator/vendor/
 wp-content/plugins/csv-page-generator/node_modules/
+wp-content/plugins/akismet/
 
 # CSV upload files (for development)
 wp-content/uploads/csv-imports/
