@@ -79,12 +79,12 @@ class Processor {
 	 * @param Logger $logger Logger instance.
 	 */
 	public function __construct( Logger $logger ) {
-		$this->logger = $logger;
-		$this->parser = new Parser( $logger );
+		$this->logger    = $logger;
+		$this->parser    = new Parser( $logger );
 		$this->validator = new Validator( $logger );
 		$this->generator = new Generator( $logger );
-		$this->database = new Database( $logger );
-		$this->settings = get_option( 'csv_page_generator_settings', array() );
+		$this->database  = new Database( $logger );
+		$this->settings  = get_option( 'csv_page_generator_settings', array() );
 	}
 
 	/**
@@ -99,18 +99,24 @@ class Processor {
 		$start_time = microtime( true );
 
 		// Set default options
-		$options = wp_parse_args( $options, array(
-			'post_status'  => $this->settings['default_post_status'] ?? 'draft',
-			'post_author'  => $this->settings['default_post_author'] ?? get_current_user_id(),
-			'batch_size'   => $this->settings['batch_size'] ?? 100,
-			'skip_errors'  => true,
-			'send_notifications' => $this->settings['enable_notifications'] ?? false,
-		) );
+		$options = wp_parse_args(
+			$options,
+			array(
+				'post_status'        => $this->settings['default_post_status'] ?? 'draft',
+				'post_author'        => $this->settings['default_post_author'] ?? get_current_user_id(),
+				'batch_size'         => $this->settings['batch_size'] ?? 100,
+				'skip_errors'        => true,
+				'send_notifications' => $this->settings['enable_notifications'] ?? false,
+			)
+		);
 
-		$this->logger->info( 'Starting CSV file processing', array(
-			'file_path' => $file_path,
-			'options'   => $options,
-		) );
+		$this->logger->info(
+			'Starting CSV file processing',
+			array(
+				'file_path' => $file_path,
+				'options'   => $options,
+			)
+		);
 
 		try {
 			// Create import record
@@ -133,11 +139,14 @@ class Processor {
 			$final_results = $this->finalize_import( $parsed_data, $validation_results, $processing_results );
 
 			$processing_time = microtime( true ) - $start_time;
-			$this->logger->info( 'CSV processing completed successfully', array(
-				'import_id'       => $this->import_id,
-				'processing_time' => $processing_time,
-				'results'         => $final_results,
-			) );
+			$this->logger->info(
+				'CSV processing completed successfully',
+				array(
+					'import_id'       => $this->import_id,
+					'processing_time' => $processing_time,
+					'results'         => $final_results,
+				)
+			);
 
 			// Send notification if enabled
 			if ( $options['send_notifications'] ) {
@@ -205,32 +214,41 @@ class Processor {
 		);
 
 		$batch_size = $options['batch_size'];
-		$valid_rows = array_filter( $validation_results['row_results'], function( $row ) {
-			return $row['valid'];
-		} );
+		$valid_rows = array_filter(
+			$validation_results['row_results'],
+			function ( $row ) {
+				return $row['valid'];
+			}
+		);
 
 		$total_valid = count( $valid_rows );
-		$processed = 0;
+		$processed   = 0;
 
 		// Update total rows in import record
-		$this->update_import_status( 'processing', array(
-			'total_rows' => $validation_results['total_rows'],
-		) );
+		$this->update_import_status(
+			'processing',
+			array(
+				'total_rows' => $validation_results['total_rows'],
+			)
+		);
 
 		// Process in batches
 		$batches = array_chunk( $valid_rows, $batch_size, true );
-		
+
 		foreach ( $batches as $batch_index => $batch ) {
-			$this->logger->debug( 'Processing batch', array(
-				'batch_index' => $batch_index + 1,
-				'batch_size'  => count( $batch ),
-				'total_batches' => count( $batches ),
-			) );
+			$this->logger->debug(
+				'Processing batch',
+				array(
+					'batch_index'   => $batch_index + 1,
+					'batch_size'    => count( $batch ),
+					'total_batches' => count( $batches ),
+				)
+			);
 
 			foreach ( $batch as $row_index => $row_result ) {
 				try {
 					$page_data = $this->prepare_page_data( $row_result['data'], $options );
-					$page_id = $this->generator->create_page( $page_data );
+					$page_id   = $this->generator->create_page( $page_data );
 
 					$results['created_pages'][] = array(
 						'page_id'    => $page_id,
@@ -239,7 +257,7 @@ class Processor {
 						'row_number' => $row_result['row_number'],
 					);
 
-					$processed++;
+					++$processed;
 
 				} catch ( \Exception $e ) {
 					$error_info = array(
@@ -259,11 +277,14 @@ class Processor {
 				}
 
 				// Update progress
-				$this->update_import_status( 'processing', array(
-					'processed_rows'  => $processed,
-					'successful_rows' => count( $results['created_pages'] ),
-					'failed_rows'     => count( $results['failed_pages'] ),
-				) );
+				$this->update_import_status(
+					'processing',
+					array(
+						'processed_rows'  => $processed,
+						'successful_rows' => count( $results['created_pages'] ),
+						'failed_rows'     => count( $results['failed_pages'] ),
+					)
+				);
 			}
 
 			// Allow for memory cleanup between batches
@@ -309,7 +330,7 @@ class Processor {
 
 		// Handle categories (convert to tags for pages)
 		if ( ! empty( $row_data['categories'] ) ) {
-			$categories = array_map( 'trim', explode( ',', $row_data['categories'] ) );
+			$categories              = array_map( 'trim', explode( ',', $row_data['categories'] ) );
 			$page_data['tags_input'] = $categories;
 		}
 
@@ -331,29 +352,32 @@ class Processor {
 	 */
 	private function finalize_import( array $parsed_data, array $validation_results, array $processing_results ) {
 		$final_results = array(
-			'import_id'       => $this->import_id,
-			'total_rows'      => $parsed_data['total_rows'],
-			'valid_rows'      => $validation_results['valid_rows'],
-			'invalid_rows'    => $validation_results['invalid_rows'],
-			'processed_rows'  => $processing_results['total_processed'],
-			'created_pages'   => count( $processing_results['created_pages'] ),
-			'failed_pages'    => count( $processing_results['failed_pages'] ),
-			'warnings'        => $validation_results['warnings'],
-			'pages'           => $processing_results['created_pages'],
-			'errors'          => $processing_results['failed_pages'],
-			'completed_at'    => current_time( 'mysql' ),
+			'import_id'      => $this->import_id,
+			'total_rows'     => $parsed_data['total_rows'],
+			'valid_rows'     => $validation_results['valid_rows'],
+			'invalid_rows'   => $validation_results['invalid_rows'],
+			'processed_rows' => $processing_results['total_processed'],
+			'created_pages'  => count( $processing_results['created_pages'] ),
+			'failed_pages'   => count( $processing_results['failed_pages'] ),
+			'warnings'       => $validation_results['warnings'],
+			'pages'          => $processing_results['created_pages'],
+			'errors'         => $processing_results['failed_pages'],
+			'completed_at'   => current_time( 'mysql' ),
 		);
 
 		// Update final import record
-		$this->update_import_status( 'completed', array(
-			'total_rows'      => $final_results['total_rows'],
-			'processed_rows'  => $final_results['processed_rows'],
-			'successful_rows' => $final_results['created_pages'],
-			'failed_rows'     => $final_results['failed_pages'],
-			'completed_at'    => $final_results['completed_at'],
-			'created_pages'   => wp_json_encode( $processing_results['created_pages'] ),
-			'error_log'       => wp_json_encode( $processing_results['failed_pages'] ),
-		) );
+		$this->update_import_status(
+			'completed',
+			array(
+				'total_rows'      => $final_results['total_rows'],
+				'processed_rows'  => $final_results['processed_rows'],
+				'successful_rows' => $final_results['created_pages'],
+				'failed_rows'     => $final_results['failed_pages'],
+				'completed_at'    => $final_results['completed_at'],
+				'created_pages'   => wp_json_encode( $processing_results['created_pages'] ),
+				'error_log'       => wp_json_encode( $processing_results['failed_pages'] ),
+			)
+		);
 
 		return $final_results;
 	}
@@ -364,17 +388,23 @@ class Processor {
 	 * @param \Exception $exception The exception that occurred.
 	 */
 	private function handle_processing_error( \Exception $exception ) {
-		$this->logger->error( 'CSV processing failed', array(
-			'import_id' => $this->import_id,
-			'error'     => $exception->getMessage(),
-			'trace'     => $exception->getTraceAsString(),
-		) );
+		$this->logger->error(
+			'CSV processing failed',
+			array(
+				'import_id' => $this->import_id,
+				'error'     => $exception->getMessage(),
+				'trace'     => $exception->getTraceAsString(),
+			)
+		);
 
 		if ( $this->import_id ) {
-			$this->update_import_status( 'failed', array(
-				'error_log'    => $exception->getMessage(),
-				'completed_at' => current_time( 'mysql' ),
-			) );
+			$this->update_import_status(
+				'failed',
+				array(
+					'error_log'    => $exception->getMessage(),
+					'completed_at' => current_time( 'mysql' ),
+				)
+			);
 		}
 	}
 
@@ -385,7 +415,7 @@ class Processor {
 	 */
 	private function send_completion_notification( array $results ) {
 		$notification_email = $this->settings['notification_email'] ?? get_option( 'admin_email' );
-		
+
 		if ( empty( $notification_email ) ) {
 			return;
 		}
@@ -426,10 +456,13 @@ class Processor {
 	 */
 	public function cancel_import( $import_id ) {
 		$this->logger->info( 'Import cancelled by user', array( 'import_id' => $import_id ) );
-		
-		return $this->database->update_import_record( $import_id, array(
-			'status'       => 'cancelled',
-			'completed_at' => current_time( 'mysql' ),
-		) );
+
+		return $this->database->update_import_record(
+			$import_id,
+			array(
+				'status'       => 'cancelled',
+				'completed_at' => current_time( 'mysql' ),
+			)
+		);
 	}
 }

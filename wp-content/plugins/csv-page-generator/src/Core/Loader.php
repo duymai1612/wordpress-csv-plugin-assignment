@@ -143,8 +143,8 @@ class Loader {
 	public function remove_action( $hook, $component, $callback ) {
 		foreach ( $this->actions as $key => $action ) {
 			if ( $action['hook'] === $hook &&
-				 $action['component'] === $component &&
-				 $action['callback'] === $callback ) {
+				$action['component'] === $component &&
+				$action['callback'] === $callback ) {
 				unset( $this->actions[ $key ] );
 				return true;
 			}
@@ -163,8 +163,8 @@ class Loader {
 	public function remove_filter( $hook, $component, $callback ) {
 		foreach ( $this->filters as $key => $filter ) {
 			if ( $filter['hook'] === $hook &&
-				 $filter['component'] === $component &&
-				 $filter['callback'] === $callback ) {
+				$filter['component'] === $component &&
+				$filter['callback'] === $callback ) {
 				unset( $this->filters[ $key ] );
 				return true;
 			}

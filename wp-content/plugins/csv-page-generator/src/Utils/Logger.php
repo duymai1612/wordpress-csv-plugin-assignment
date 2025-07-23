@@ -73,7 +73,7 @@ class Logger {
 	 */
 	private function setup_log_file() {
 		$upload_dir = wp_upload_dir();
-		$log_dir = $upload_dir['basedir'] . '/csv-imports/logs';
+		$log_dir    = $upload_dir['basedir'] . '/csv-imports/logs';
 
 		// Ensure log directory exists
 		if ( ! file_exists( $log_dir ) ) {
@@ -201,7 +201,7 @@ class Logger {
 	 */
 	private function should_log_level( $level ) {
 		$configured_level = $this->settings['log_level'] ?? self::INFO;
-		
+
 		if ( ! isset( self::$level_priorities[ $level ] ) || ! isset( self::$level_priorities[ $configured_level ] ) ) {
 			return true; // Log if we can't determine the level
 		}
@@ -219,8 +219,8 @@ class Logger {
 	 */
 	private function format_log_entry( $level, $message, array $context = array() ) {
 		$timestamp = current_time( 'Y-m-d H:i:s' );
-		$level = strtoupper( $level );
-		
+		$level     = strtoupper( $level );
+
 		// Replace placeholders in message with context values
 		$message = $this->interpolate( $message, $context );
 
@@ -229,14 +229,14 @@ class Logger {
 		// Add context data if present
 		if ( ! empty( $context ) ) {
 			$context_string = wp_json_encode( $context, JSON_UNESCAPED_SLASHES );
-			$log_entry .= ' Context: ' . $context_string;
+			$log_entry     .= ' Context: ' . $context_string;
 		}
 
 		// Add memory usage and execution time for debugging
 		if ( $level === 'DEBUG' ) {
 			$memory_usage = memory_get_usage( true );
-			$memory_peak = memory_get_peak_usage( true );
-			$log_entry .= sprintf( ' [Memory: %s / Peak: %s]', size_format( $memory_usage ), size_format( $memory_peak ) );
+			$memory_peak  = memory_get_peak_usage( true );
+			$log_entry   .= sprintf( ' [Memory: %s / Peak: %s]', size_format( $memory_usage ), size_format( $memory_peak ) );
 		}
 
 		return $log_entry;
@@ -289,7 +289,7 @@ class Logger {
 
 		if ( file_exists( $this->log_file ) && filesize( $this->log_file ) > $max_size ) {
 			$backup_file = $this->log_file . '.backup';
-			
+
 			// Remove old backup if exists
 			if ( file_exists( $backup_file ) ) {
 				unlink( $backup_file );
@@ -312,7 +312,7 @@ class Logger {
 		}
 
 		$file_lines = file( $this->log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
-		
+
 		if ( ! $file_lines ) {
 			return array();
 		}
@@ -325,7 +325,7 @@ class Logger {
 	 */
 	public function clear_logs() {
 		$upload_dir = wp_upload_dir();
-		$log_dir = $upload_dir['basedir'] . '/csv-imports/logs';
+		$log_dir    = $upload_dir['basedir'] . '/csv-imports/logs';
 
 		if ( is_dir( $log_dir ) ) {
 			$files = glob( $log_dir . '/*.log*' );

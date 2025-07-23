@@ -68,9 +68,9 @@ class Plugin {
 	 * Private constructor to prevent direct instantiation.
 	 */
 	private function __construct() {
-		$this->version = defined( 'CSV_PAGE_GENERATOR_VERSION' ) ? CSV_PAGE_GENERATOR_VERSION : '1.0.0';
-		$this->loader = new Loader();
-		$this->logger = new Logger();
+		$this->version       = defined( 'CSV_PAGE_GENERATOR_VERSION' ) ? CSV_PAGE_GENERATOR_VERSION : '1.0.0';
+		$this->loader        = new Loader();
+		$this->logger        = new Logger();
 		$this->nonce_manager = new NonceManager();
 	}
 
@@ -221,11 +221,11 @@ class Plugin {
 			'csv-page-generator-admin',
 			'csvPageGenerator',
 			array(
-				'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
-				'adminUrl'   => admin_url( '' ), // Fix: Add missing adminUrl
-				'uploadNonce' => $this->nonce_manager->create_nonce( 'csv_page_generator_upload' ),
+				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+				'adminUrl'      => admin_url( '' ), // Fix: Add missing adminUrl
+				'uploadNonce'   => $this->nonce_manager->create_nonce( 'csv_page_generator_upload' ),
 				'progressNonce' => $this->nonce_manager->create_nonce( 'csv_page_generator_progress' ),
-				'strings'    => array(
+				'strings'       => array(
 					'uploading'     => __( 'Uploading...', 'csv-page-generator' ),
 					'processing'    => __( 'Processing...', 'csv-page-generator' ),
 					'complete'      => __( 'Complete!', 'csv-page-generator' ),

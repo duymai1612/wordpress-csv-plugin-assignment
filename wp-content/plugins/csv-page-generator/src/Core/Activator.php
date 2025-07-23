@@ -145,18 +145,18 @@ class Activator {
 	 */
 	private static function set_default_options() {
 		$default_settings = array(
-			'max_file_size'       => 10485760, // 10MB
-			'max_rows'            => 10000,
-			'batch_size'          => 100,
-			'allowed_file_types'  => array( 'csv' ),
-			'default_post_status' => 'draft',
-			'default_post_author' => get_current_user_id(),
+			'max_file_size'        => 10485760, // 10MB
+			'max_rows'             => 10000,
+			'batch_size'           => 100,
+			'allowed_file_types'   => array( 'csv' ),
+			'default_post_status'  => 'draft',
+			'default_post_author'  => get_current_user_id(),
 			'enable_notifications' => true,
-			'notification_email'  => get_option( 'admin_email' ),
-			'enable_logging'      => true,
-			'log_level'           => 'info',
-			'enable_cleanup'      => true,
-			'cleanup_days'        => 30,
+			'notification_email'   => get_option( 'admin_email' ),
+			'enable_logging'       => true,
+			'log_level'            => 'info',
+			'enable_cleanup'       => true,
+			'cleanup_days'         => 30,
 		);
 
 		// Only set if not already exists
@@ -172,7 +172,7 @@ class Activator {
 	 * Create necessary upload directories.
 	 */
 	private static function create_upload_directories() {
-		$upload_dir = wp_upload_dir();
+		$upload_dir     = wp_upload_dir();
 		$csv_upload_dir = $upload_dir['basedir'] . '/csv-imports';
 
 		// Create main upload directory
@@ -192,7 +192,7 @@ class Activator {
 		// Create .htaccess file for security
 		$htaccess_file = $csv_upload_dir . '/.htaccess';
 		if ( ! file_exists( $htaccess_file ) ) {
-			$htaccess_content = "# Deny direct access to uploaded files\n";
+			$htaccess_content  = "# Deny direct access to uploaded files\n";
 			$htaccess_content .= "Order deny,allow\n";
 			$htaccess_content .= "Deny from all\n";
 			$htaccess_content .= "<Files ~ \"\\.(csv)$\">\n";
@@ -205,8 +205,8 @@ class Activator {
 
 		// Create index.php files for security
 		$index_content = "<?php\n// Silence is golden.\n";
-		$directories = array( $csv_upload_dir, $csv_upload_dir . '/temp', $csv_upload_dir . '/processed', $csv_upload_dir . '/logs' );
-		
+		$directories   = array( $csv_upload_dir, $csv_upload_dir . '/temp', $csv_upload_dir . '/processed', $csv_upload_dir . '/logs' );
+
 		foreach ( $directories as $dir ) {
 			$index_file = $dir . '/index.php';
 			if ( ! file_exists( $index_file ) ) {
@@ -221,7 +221,7 @@ class Activator {
 	private static function setup_capabilities() {
 		// Get administrator role
 		$admin_role = get_role( 'administrator' );
-		
+
 		if ( $admin_role ) {
 			// Add custom capabilities
 			$admin_role->add_cap( 'csv_page_generator_upload' );
@@ -232,7 +232,7 @@ class Activator {
 
 		// Get editor role
 		$editor_role = get_role( 'editor' );
-		
+
 		if ( $editor_role ) {
 			// Add limited capabilities for editors
 			$editor_role->add_cap( 'csv_page_generator_upload' );
@@ -253,11 +253,11 @@ class Activator {
 	 * Create sample CSV file for testing.
 	 */
 	private static function create_sample_csv() {
-		$upload_dir = wp_upload_dir();
+		$upload_dir  = wp_upload_dir();
 		$sample_file = $upload_dir['basedir'] . '/csv-imports/sample.csv';
 
 		if ( ! file_exists( $sample_file ) ) {
-			$sample_content = "Title,Description\n";
+			$sample_content  = "Title,Description\n";
 			$sample_content .= "\"Sample Page 1\",\"This is a sample page description for testing the CSV import functionality.\"\n";
 			$sample_content .= "\"Sample Page 2\",\"Another sample page with different content to demonstrate the import process.\"\n";
 			$sample_content .= "\"Sample Page 3\",\"A third sample page to show how multiple pages can be created from CSV data.\"\n";

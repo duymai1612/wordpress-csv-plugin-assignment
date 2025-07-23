@@ -64,10 +64,10 @@ class AdminPage {
 	 * @param Logger       $logger Logger instance.
 	 */
 	public function __construct( $version, NonceManager $nonce_manager, Logger $logger ) {
-		$this->version = $version;
-		$this->nonce_manager = $nonce_manager;
-		$this->logger = $logger;
-		$this->settings = get_option( 'csv_page_generator_settings', array() );
+		$this->version        = $version;
+		$this->nonce_manager  = $nonce_manager;
+		$this->logger         = $logger;
+		$this->settings       = get_option( 'csv_page_generator_settings', array() );
 		$this->upload_handler = new UploadHandler( $logger );
 	}
 
@@ -195,7 +195,7 @@ class AdminPage {
 
 		// Include the main page template
 		$template_path = CSV_PAGE_GENERATOR_PLUGIN_DIR . 'templates/admin/upload-form.php';
-		
+
 		if ( file_exists( $template_path ) ) {
 			include $template_path;
 		} else {
@@ -220,20 +220,22 @@ class AdminPage {
 		$table_name = $wpdb->prefix . 'csv_page_generator_imports';
 
 		// Handle pagination
-		$per_page = 20;
+		$per_page     = 20;
 		$current_page = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
-		$offset = ( $current_page - 1 ) * $per_page;
+		$offset       = ( $current_page - 1 ) * $per_page;
 
 		// Get total count for pagination
 		$total_items = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
 		$total_pages = ceil( $total_items / $per_page );
 
 		// Get import records with pagination
-		$imports = $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM {$table_name} ORDER BY started_at DESC LIMIT %d OFFSET %d",
-			$per_page,
-			$offset
-		) );
+		$imports = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table_name} ORDER BY started_at DESC LIMIT %d OFFSET %d",
+				$per_page,
+				$offset
+			)
+		);
 
 		// Include the history page template
 		$template_path = CSV_PAGE_GENERATOR_PLUGIN_DIR . 'templates/admin/import-history.php';
@@ -297,7 +299,7 @@ class AdminPage {
 
 		// Include the settings page template
 		$template_path = plugin_dir_path( dirname( __DIR__ ) ) . 'templates/admin/settings.php';
-		
+
 		if ( file_exists( $template_path ) ) {
 			include $template_path;
 		} else {
@@ -344,9 +346,9 @@ class AdminPage {
 		}
 
 		if ( isset( $input['default_post_status'] ) ) {
-			$allowed_statuses = array( 'draft', 'publish', 'private' );
-			$sanitized['default_post_status'] = in_array( $input['default_post_status'], $allowed_statuses, true ) 
-				? $input['default_post_status'] 
+			$allowed_statuses                 = array( 'draft', 'publish', 'private' );
+			$sanitized['default_post_status'] = in_array( $input['default_post_status'], $allowed_statuses, true )
+				? $input['default_post_status']
 				: 'draft';
 		}
 
@@ -389,7 +391,7 @@ class AdminPage {
 	 * Default post status field callback.
 	 */
 	public function default_post_status_callback() {
-		$value = $this->settings['default_post_status'] ?? 'draft';
+		$value    = $this->settings['default_post_status'] ?? 'draft';
 		$statuses = array(
 			'draft'   => __( 'Draft', 'csv-page-generator' ),
 			'publish' => __( 'Published', 'csv-page-generator' ),

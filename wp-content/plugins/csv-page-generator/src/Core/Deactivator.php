@@ -25,7 +25,7 @@ class Deactivator {
 	 * - Cleans up temporary files
 	 * - Removes transients
 	 * - Flushes rewrite rules
-	 * 
+	 *
 	 * Note: This does NOT remove user data, settings, or database tables.
 	 * That is handled by the uninstall.php file when the plugin is deleted.
 	 */
@@ -81,7 +81,7 @@ class Deactivator {
 	 */
 	private static function cleanup_temporary_files() {
 		$upload_dir = wp_upload_dir();
-		$temp_dir = $upload_dir['basedir'] . '/csv-imports/temp';
+		$temp_dir   = $upload_dir['basedir'] . '/csv-imports/temp';
 
 		if ( is_dir( $temp_dir ) ) {
 			$files = glob( $temp_dir . '/*' );
@@ -125,14 +125,14 @@ class Deactivator {
 
 	/**
 	 * Remove user capabilities (optional - currently commented out).
-	 * 
+	 *
 	 * This method is available but not called by default to preserve
 	 * user permissions in case the plugin is reactivated.
 	 */
 	private static function remove_capabilities() {
 		// Get all roles
 		$roles = wp_roles();
-		
+
 		if ( ! $roles ) {
 			return;
 		}
@@ -162,10 +162,10 @@ class Deactivator {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'csv_page_generator_imports';
-		
+
 		// Check if table exists
 		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
-		
+
 		if ( $table_exists ) {
 			// Update any running imports to cancelled status
 			$wpdb->update(
@@ -199,7 +199,7 @@ class Deactivator {
 	 */
 	private static function send_deactivation_notification() {
 		$settings = get_option( 'csv_page_generator_settings', array() );
-		
+
 		if ( ! empty( $settings['enable_notifications'] ) && ! empty( $settings['notification_email'] ) ) {
 			$subject = sprintf(
 				/* translators: %s: Site name */
@@ -224,10 +224,10 @@ class Deactivator {
 	 */
 	private static function log_deactivation_details() {
 		$details = array(
-			'timestamp'    => current_time( 'mysql' ),
-			'user_id'      => get_current_user_id(),
-			'user_login'   => wp_get_current_user()->user_login,
-			'site_url'     => home_url(),
+			'timestamp'      => current_time( 'mysql' ),
+			'user_id'        => get_current_user_id(),
+			'user_login'     => wp_get_current_user()->user_login,
+			'site_url'       => home_url(),
 			'plugin_version' => defined( 'CSV_PAGE_GENERATOR_VERSION' ) ? CSV_PAGE_GENERATOR_VERSION : 'unknown',
 		);
 

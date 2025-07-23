@@ -47,7 +47,7 @@ class Validator {
 	 * @param Logger $logger Logger instance.
 	 */
 	public function __construct( Logger $logger ) {
-		$this->logger = $logger;
+		$this->logger   = $logger;
 		$this->settings = get_option( 'csv_page_generator_settings', array() );
 		$this->setup_validation_rules();
 	}
@@ -57,36 +57,36 @@ class Validator {
 	 */
 	private function setup_validation_rules() {
 		$this->validation_rules = array(
-			'title' => array(
+			'title'              => array(
 				'required'   => true,
 				'max_length' => 255,
 				'min_length' => 1,
 				'sanitize'   => 'sanitize_text_field',
 			),
-			'description' => array(
+			'description'        => array(
 				'required'   => true,
 				'max_length' => 65535,
 				'min_length' => 1,
 				'sanitize'   => 'wp_kses_post',
 			),
-			'slug' => array(
+			'slug'               => array(
 				'required'   => false,
 				'max_length' => 200,
 				'pattern'    => '/^[a-z0-9-]+$/',
 				'sanitize'   => 'sanitize_title',
 			),
-			'status' => array(
-				'required'   => false,
-				'allowed'    => array( 'draft', 'publish', 'private', 'pending' ),
-				'default'    => 'draft',
-				'sanitize'   => 'sanitize_text_field',
+			'status'             => array(
+				'required' => false,
+				'allowed'  => array( 'draft', 'publish', 'private', 'pending' ),
+				'default'  => 'draft',
+				'sanitize' => 'sanitize_text_field',
 			),
-			'categories' => array(
+			'categories'         => array(
 				'required'   => false,
 				'max_length' => 500,
 				'sanitize'   => 'sanitize_text_field',
 			),
-			'meta_description' => array(
+			'meta_description'   => array(
 				'required'   => false,
 				'max_length' => 160,
 				'sanitize'   => 'sanitize_text_field',
@@ -117,11 +117,11 @@ class Validator {
 		);
 
 		foreach ( $this->validation_rules as $field => $rules ) {
-			$value = $row_data[ $field ] ?? '';
+			$value        = $row_data[ $field ] ?? '';
 			$field_result = $this->validate_field( $field, $value, $rules );
 
 			if ( ! $field_result['valid'] ) {
-				$result['valid'] = false;
+				$result['valid']  = false;
 				$result['errors'] = array_merge( $result['errors'], $field_result['errors'] );
 			}
 
@@ -135,16 +135,19 @@ class Validator {
 		// Additional cross-field validation
 		$cross_validation = $this->validate_cross_fields( $result['data'] );
 		if ( ! $cross_validation['valid'] ) {
-			$result['valid'] = false;
+			$result['valid']  = false;
 			$result['errors'] = array_merge( $result['errors'], $cross_validation['errors'] );
 		}
 
 		// Log validation results for debugging
 		if ( ! $result['valid'] ) {
-			$this->logger->warning( 'Row validation failed', array(
-				'row_number' => $row_number,
-				'errors'     => $result['errors'],
-			) );
+			$this->logger->warning(
+				'Row validation failed',
+				array(
+					'row_number' => $row_number,
+					'errors'     => $result['errors'],
+				)
+			);
 		}
 
 		return $result;
@@ -169,7 +172,7 @@ class Validator {
 		// Handle empty values
 		if ( empty( $value ) ) {
 			if ( ! empty( $rules['required'] ) ) {
-				$result['valid'] = false;
+				$result['valid']    = false;
 				$result['errors'][] = sprintf(
 					/* translators: %s: field name */
 					__( 'Field "%s" is required and cannot be empty.', 'csv-page-generator' ),
@@ -195,7 +198,7 @@ class Validator {
 		if ( isset( $rules['max_length'] ) ) {
 			$length = mb_strlen( $result['value'] );
 			if ( $length > $rules['max_length'] ) {
-				$result['valid'] = false;
+				$result['valid']    = false;
 				$result['errors'][] = sprintf(
 					/* translators: 1: field name, 2: current length, 3: maximum length */
 					__( 'Field "%1$s" is too long (%2$d characters). Maximum allowed: %3$d characters.', 'csv-page-generator' ),
@@ -209,7 +212,7 @@ class Validator {
 		if ( isset( $rules['min_length'] ) ) {
 			$length = mb_strlen( $result['value'] );
 			if ( $length < $rules['min_length'] ) {
-				$result['valid'] = false;
+				$result['valid']    = false;
 				$result['errors'][] = sprintf(
 					/* translators: 1: field name, 2: current length, 3: minimum length */
 					__( 'Field "%1$s" is too short (%2$d characters). Minimum required: %3$d characters.', 'csv-page-generator' ),
@@ -222,7 +225,7 @@ class Validator {
 
 		// Pattern validation
 		if ( ! empty( $rules['pattern'] ) && ! preg_match( $rules['pattern'], $result['value'] ) ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = sprintf(
 				/* translators: %s: field name */
 				__( 'Field "%s" contains invalid characters or format.', 'csv-page-generator' ),
@@ -232,7 +235,7 @@ class Validator {
 
 		// Allowed values validation
 		if ( ! empty( $rules['allowed'] ) && ! in_array( $result['value'], $rules['allowed'], true ) ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = sprintf(
 				/* translators: 1: field name, 2: provided value, 3: allowed values */
 				__( 'Field "%1$s" has invalid value "%2$s". Allowed values: %3$s.', 'csv-page-generator' ),
@@ -245,7 +248,7 @@ class Validator {
 		// Field-specific validation
 		$specific_validation = $this->validate_field_specific( $field_name, $result['value'] );
 		if ( ! $specific_validation['valid'] ) {
-			$result['valid'] = false;
+			$result['valid']  = false;
 			$result['errors'] = array_merge( $result['errors'], $specific_validation['errors'] );
 		}
 
@@ -299,7 +302,7 @@ class Validator {
 				if ( ! empty( $value ) ) {
 					// Validate URL format
 					if ( ! filter_var( $value, FILTER_VALIDATE_URL ) ) {
-						$result['valid'] = false;
+						$result['valid']    = false;
 						$result['errors'][] = __( 'Featured image URL is not a valid URL.', 'csv-page-generator' );
 					}
 				}
@@ -363,14 +366,16 @@ class Validator {
 	 * @return bool True if title exists.
 	 */
 	private function title_exists( $title ) {
-		$query = new \WP_Query( array(
-			'post_type'      => 'page',
-			'post_status'    => 'any',
-			'title'          => $title,
-			'posts_per_page' => 1,
-			'no_found_rows'  => true,
-			'fields'         => 'ids',
-		) );
+		$query = new \WP_Query(
+			array(
+				'post_type'      => 'page',
+				'post_status'    => 'any',
+				'title'          => $title,
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+				'fields'         => 'ids',
+			)
+		);
 
 		return $query->have_posts();
 	}
@@ -394,25 +399,25 @@ class Validator {
 	 */
 	public function validate_csv_data( array $csv_data ) {
 		$summary = array(
-			'total_rows'    => count( $csv_data['rows'] ),
-			'valid_rows'    => 0,
-			'invalid_rows'  => 0,
-			'warnings'      => 0,
-			'errors'        => array(),
-			'row_results'   => array(),
+			'total_rows'   => count( $csv_data['rows'] ),
+			'valid_rows'   => 0,
+			'invalid_rows' => 0,
+			'warnings'     => 0,
+			'errors'       => array(),
+			'row_results'  => array(),
 		);
 
 		foreach ( $csv_data['rows'] as $index => $row ) {
-			$row_data = $row['data'];
+			$row_data   = $row['data'];
 			$row_number = $row['row_number'];
 
-			$validation_result = $this->validate_row( $row_data, $row_number );
+			$validation_result                = $this->validate_row( $row_data, $row_number );
 			$summary['row_results'][ $index ] = $validation_result;
 
 			if ( $validation_result['valid'] ) {
-				$summary['valid_rows']++;
+				++$summary['valid_rows'];
 			} else {
-				$summary['invalid_rows']++;
+				++$summary['invalid_rows'];
 				$summary['errors'] = array_merge( $summary['errors'], $validation_result['errors'] );
 			}
 
@@ -421,12 +426,15 @@ class Validator {
 			}
 		}
 
-		$this->logger->info( 'CSV data validation completed', array(
-			'total_rows'   => $summary['total_rows'],
-			'valid_rows'   => $summary['valid_rows'],
-			'invalid_rows' => $summary['invalid_rows'],
-			'warnings'     => $summary['warnings'],
-		) );
+		$this->logger->info(
+			'CSV data validation completed',
+			array(
+				'total_rows'   => $summary['total_rows'],
+				'valid_rows'   => $summary['valid_rows'],
+				'invalid_rows' => $summary['invalid_rows'],
+				'warnings'     => $summary['warnings'],
+			)
+		);
 
 		return $summary;
 	}

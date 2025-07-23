@@ -46,9 +46,9 @@ class Database {
 	 */
 	public function __construct( Logger $logger ) {
 		global $wpdb;
-		
-		$this->logger = $logger;
-		$this->wpdb = $wpdb;
+
+		$this->logger     = $logger;
+		$this->wpdb       = $wpdb;
 		$this->table_name = $wpdb->prefix . 'csv_page_generator_imports';
 	}
 
@@ -99,21 +99,24 @@ class Database {
 		);
 
 		if ( false === $result ) {
-			throw new \Exception( 
-				sprintf( 
+			throw new \Exception(
+				sprintf(
 					/* translators: %s: database error */
-					__( 'Failed to create import record: %s', 'csv-page-generator' ), 
-					$this->wpdb->last_error 
-				) 
+					__( 'Failed to create import record: %s', 'csv-page-generator' ),
+					$this->wpdb->last_error
+				)
 			);
 		}
 
 		$import_id = $this->wpdb->insert_id;
 
-		$this->logger->info( 'Import record created', array(
-			'import_id' => $import_id,
-			'filename'  => $data['filename'],
-		) );
+		$this->logger->info(
+			'Import record created',
+			array(
+				'import_id' => $import_id,
+				'filename'  => $data['filename'],
+			)
+		);
 
 		return $import_id;
 	}
@@ -169,10 +172,13 @@ class Database {
 		);
 
 		if ( false === $result ) {
-			$this->logger->error( 'Failed to update import record', array(
-				'import_id' => $import_id,
-				'error'     => $this->wpdb->last_error,
-			) );
+			$this->logger->error(
+				'Failed to update import record',
+				array(
+					'import_id' => $import_id,
+					'error'     => $this->wpdb->last_error,
+				)
+			);
 			return false;
 		}
 
@@ -197,7 +203,7 @@ class Database {
 		if ( $record ) {
 			// Decode JSON fields
 			$record['created_pages'] = json_decode( $record['created_pages'], true ) ?: array();
-			$record['error_log'] = json_decode( $record['error_log'], true ) ?: array();
+			$record['error_log']     = json_decode( $record['error_log'], true ) ?: array();
 		}
 
 		return $record;
@@ -211,36 +217,36 @@ class Database {
 	 */
 	public function get_import_records( array $args = array() ) {
 		$defaults = array(
-			'user_id'    => null,
-			'status'     => null,
-			'limit'      => 20,
-			'offset'     => 0,
-			'order_by'   => 'started_at',
-			'order'      => 'DESC',
+			'user_id'  => null,
+			'status'   => null,
+			'limit'    => 20,
+			'offset'   => 0,
+			'order_by' => 'started_at',
+			'order'    => 'DESC',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 
 		// Build WHERE clause
 		$where_conditions = array( '1=1' );
-		$where_values = array();
+		$where_values     = array();
 
 		if ( ! is_null( $args['user_id'] ) ) {
 			$where_conditions[] = 'user_id = %d';
-			$where_values[] = $args['user_id'];
+			$where_values[]     = $args['user_id'];
 		}
 
 		if ( ! is_null( $args['status'] ) ) {
 			$where_conditions[] = 'status = %s';
-			$where_values[] = $args['status'];
+			$where_values[]     = $args['status'];
 		}
 
 		$where_clause = implode( ' AND ', $where_conditions );
 
 		// Build ORDER BY clause
 		$allowed_order_by = array( 'id', 'started_at', 'completed_at', 'status', 'filename' );
-		$order_by = in_array( $args['order_by'], $allowed_order_by, true ) ? $args['order_by'] : 'started_at';
-		$order = 'ASC' === strtoupper( $args['order'] ) ? 'ASC' : 'DESC';
+		$order_by         = in_array( $args['order_by'], $allowed_order_by, true ) ? $args['order_by'] : 'started_at';
+		$order            = 'ASC' === strtoupper( $args['order'] ) ? 'ASC' : 'DESC';
 
 		// Get total count
 		$count_query = "SELECT COUNT(*) FROM {$this->table_name} WHERE {$where_clause}";
@@ -256,7 +262,7 @@ class Database {
 				  LIMIT %d OFFSET %d";
 
 		$query_values = array_merge( $where_values, array( $args['limit'], $args['offset'] ) );
-		$records = $this->wpdb->get_results(
+		$records      = $this->wpdb->get_results(
 			$this->wpdb->prepare( $query, $query_values ),
 			ARRAY_A
 		);
@@ -264,16 +270,16 @@ class Database {
 		// Decode JSON fields for each record
 		foreach ( $records as &$record ) {
 			$record['created_pages'] = json_decode( $record['created_pages'], true ) ?: array();
-			$record['error_log'] = json_decode( $record['error_log'], true ) ?: array();
+			$record['error_log']     = json_decode( $record['error_log'], true ) ?: array();
 		}
 
 		return array(
-			'records'       => $records,
-			'total'         => (int) $total_records,
-			'limit'         => $args['limit'],
-			'offset'        => $args['offset'],
-			'total_pages'   => ceil( $total_records / $args['limit'] ),
-			'current_page'  => floor( $args['offset'] / $args['limit'] ) + 1,
+			'records'      => $records,
+			'total'        => (int) $total_records,
+			'limit'        => $args['limit'],
+			'offset'       => $args['offset'],
+			'total_pages'  => ceil( $total_records / $args['limit'] ),
+			'current_page' => floor( $args['offset'] / $args['limit'] ) + 1,
 		);
 	}
 
@@ -291,10 +297,13 @@ class Database {
 		);
 
 		if ( false === $result ) {
-			$this->logger->error( 'Failed to delete import record', array(
-				'import_id' => $import_id,
-				'error'     => $this->wpdb->last_error,
-			) );
+			$this->logger->error(
+				'Failed to delete import record',
+				array(
+					'import_id' => $import_id,
+					'error'     => $this->wpdb->last_error,
+				)
+			);
 			return false;
 		}
 
@@ -310,30 +319,30 @@ class Database {
 	 */
 	public function get_import_statistics( array $args = array() ) {
 		$defaults = array(
-			'user_id'    => null,
-			'date_from'  => null,
-			'date_to'    => null,
+			'user_id'   => null,
+			'date_from' => null,
+			'date_to'   => null,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 
 		// Build WHERE clause
 		$where_conditions = array( '1=1' );
-		$where_values = array();
+		$where_values     = array();
 
 		if ( ! is_null( $args['user_id'] ) ) {
 			$where_conditions[] = 'user_id = %d';
-			$where_values[] = $args['user_id'];
+			$where_values[]     = $args['user_id'];
 		}
 
 		if ( ! is_null( $args['date_from'] ) ) {
 			$where_conditions[] = 'started_at >= %s';
-			$where_values[] = $args['date_from'];
+			$where_values[]     = $args['date_from'];
 		}
 
 		if ( ! is_null( $args['date_to'] ) ) {
 			$where_conditions[] = 'started_at <= %s';
-			$where_values[] = $args['date_to'];
+			$where_values[]     = $args['date_to'];
 		}
 
 		$where_clause = implode( ' AND ', $where_conditions );
@@ -383,10 +392,13 @@ class Database {
 		);
 
 		if ( $deleted > 0 ) {
-			$this->logger->info( 'Old import records cleaned up', array(
-				'deleted_records' => $deleted,
-				'cutoff_date'     => $cutoff_date,
-			) );
+			$this->logger->info(
+				'Old import records cleaned up',
+				array(
+					'deleted_records' => $deleted,
+					'cutoff_date'     => $cutoff_date,
+				)
+			);
 		}
 
 		return $deleted;

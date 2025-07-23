@@ -101,6 +101,7 @@ coverage/
 phpunit.xml.local
 tests/_output/
 tests/_support/_generated/
+.phpunit.result.cache
 
 # Plugin specific
 wp-content/plugins/csv-page-generator/assets/dist/

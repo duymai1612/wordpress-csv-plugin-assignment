@@ -222,5 +222,5 @@ register_shutdown_function( function() {
 	\Brain\Monkey\tearDown();
 } );
 
-// Load plugin main file for testing (skip to avoid WordPress dependency issues)
-// require_once dirname( __DIR__ ) . '/csv-page-generator.php';
+// Note: Plugin main file not loaded to avoid WordPress dependency issues in unit tests
+// For integration tests, consider loading WordPress test environment

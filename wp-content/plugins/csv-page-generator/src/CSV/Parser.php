@@ -55,7 +55,7 @@ class Parser {
 	 * @param Logger $logger Logger instance.
 	 */
 	public function __construct( Logger $logger ) {
-		$this->logger = $logger;
+		$this->logger   = $logger;
 		$this->settings = get_option( 'csv_page_generator_settings', array() );
 	}
 
@@ -74,20 +74,26 @@ class Parser {
 		}
 
 		// Set default options
-		$options = wp_parse_args( $options, array(
-			'delimiter'     => ',',
-			'enclosure'     => '"',
-			'escape'        => '\\',
-			'encoding'      => 'auto',
-			'skip_empty'    => true,
-			'max_rows'      => $this->settings['max_rows'] ?? 10000,
-		) );
+		$options = wp_parse_args(
+			$options,
+			array(
+				'delimiter'  => ',',
+				'enclosure'  => '"',
+				'escape'     => '\\',
+				'encoding'   => 'auto',
+				'skip_empty' => true,
+				'max_rows'   => $this->settings['max_rows'] ?? 10000,
+			)
+		);
 
-		$this->logger->info( 'Starting CSV file parsing', array(
-			'file_path' => $file_path,
-			'file_size' => filesize( $file_path ),
-			'options'   => $options,
-		) );
+		$this->logger->info(
+			'Starting CSV file parsing',
+			array(
+				'file_path' => $file_path,
+				'file_size' => filesize( $file_path ),
+				'options'   => $options,
+			)
+		);
 
 		try {
 			// Detect and convert encoding if needed
@@ -96,18 +102,24 @@ class Parser {
 			// Parse CSV content
 			$parsed_data = $this->parse_csv_content( $content, $options );
 
-			$this->logger->info( 'CSV file parsed successfully', array(
-				'total_rows' => count( $parsed_data['rows'] ),
-				'headers'    => $parsed_data['headers'],
-			) );
+			$this->logger->info(
+				'CSV file parsed successfully',
+				array(
+					'total_rows' => count( $parsed_data['rows'] ),
+					'headers'    => $parsed_data['headers'],
+				)
+			);
 
 			return $parsed_data;
 
 		} catch ( \Exception $e ) {
-			$this->logger->error( 'CSV parsing failed', array(
-				'error'     => $e->getMessage(),
-				'file_path' => $file_path,
-			) );
+			$this->logger->error(
+				'CSV parsing failed',
+				array(
+					'error'     => $e->getMessage(),
+					'file_path' => $file_path,
+				)
+			);
 			throw $e;
 		}
 	}
@@ -122,7 +134,7 @@ class Parser {
 	 */
 	private function read_and_convert_encoding( $file_path, $target_encoding = 'UTF-8' ) {
 		$content = file_get_contents( $file_path );
-		
+
 		if ( false === $content ) {
 			throw new \Exception( __( 'Failed to read CSV file content.', 'csv-page-generator' ) );
 		}
@@ -141,22 +153,25 @@ class Parser {
 		// Convert to UTF-8 if needed
 		if ( 'UTF-8' !== $detected_encoding ) {
 			$converted_content = mb_convert_encoding( $content, 'UTF-8', $detected_encoding );
-			
+
 			if ( false === $converted_content ) {
-				throw new \Exception( 
-					sprintf( 
+				throw new \Exception(
+					sprintf(
 						/* translators: %s: detected encoding */
-						__( 'Failed to convert file encoding from %s to UTF-8.', 'csv-page-generator' ), 
-						$detected_encoding 
-					) 
+						__( 'Failed to convert file encoding from %s to UTF-8.', 'csv-page-generator' ),
+						$detected_encoding
+					)
 				);
 			}
-			
+
 			$content = $converted_content;
-			$this->logger->info( 'File encoding converted', array(
-				'from' => $detected_encoding,
-				'to'   => 'UTF-8',
-			) );
+			$this->logger->info(
+				'File encoding converted',
+				array(
+					'from' => $detected_encoding,
+					'to'   => 'UTF-8',
+				)
+			);
 		}
 
 		return $content;
@@ -234,26 +249,26 @@ class Parser {
 		fwrite( $temp_file, $content );
 		rewind( $temp_file );
 
-		$headers = array();
-		$rows = array();
+		$headers    = array();
+		$rows       = array();
 		$row_number = 0;
-		$errors = array();
+		$errors     = array();
 
 		try {
 			// Read headers
 			$header_row = fgetcsv( $temp_file, 0, $options['delimiter'], $options['enclosure'], $options['escape'] );
-			
+
 			if ( false === $header_row || empty( $header_row ) ) {
 				throw new \Exception( __( 'CSV file appears to be empty or has no valid headers.', 'csv-page-generator' ) );
 			}
 
 			// Clean and validate headers
 			$headers = $this->process_headers( $header_row );
-			$row_number++;
+			++$row_number;
 
 			// Read data rows
 			while ( ( $row = fgetcsv( $temp_file, 0, $options['delimiter'], $options['enclosure'], $options['escape'] ) ) !== false ) {
-				$row_number++;
+				++$row_number;
 
 				// Skip empty rows if requested
 				if ( $options['skip_empty'] && $this->is_empty_row( $row ) ) {
@@ -262,31 +277,36 @@ class Parser {
 
 				// Check row limit
 				if ( count( $rows ) >= $options['max_rows'] ) {
-					$this->logger->warning( 'Maximum row limit reached', array(
-						'max_rows'   => $options['max_rows'],
-						'row_number' => $row_number,
-					) );
+					$this->logger->warning(
+						'Maximum row limit reached',
+						array(
+							'max_rows'   => $options['max_rows'],
+							'row_number' => $row_number,
+						)
+					);
 					break;
 				}
 
 				// Process row data
 				try {
 					$processed_row = $this->process_row( $row, $headers, $row_number );
-					$rows[] = $processed_row;
+					$rows[]        = $processed_row;
 				} catch ( \Exception $e ) {
 					$errors[] = array(
 						'row_number' => $row_number,
 						'error'      => $e->getMessage(),
 						'raw_data'   => $row,
 					);
-					
-					$this->logger->warning( 'Row processing error', array(
-						'row_number' => $row_number,
-						'error'      => $e->getMessage(),
-					) );
+
+					$this->logger->warning(
+						'Row processing error',
+						array(
+							'row_number' => $row_number,
+							'error'      => $e->getMessage(),
+						)
+					);
 				}
 			}
-
 		} finally {
 			fclose( $temp_file );
 		}
@@ -309,31 +329,31 @@ class Parser {
 	 * @throws \Exception If required headers are missing.
 	 */
 	private function process_headers( array $header_row ) {
-		$headers = array();
+		$headers          = array();
 		$required_headers = array( 'title', 'description' );
 
 		// Clean and normalize headers
 		foreach ( $header_row as $index => $header ) {
-			$clean_header = trim( $header );
+			$clean_header      = trim( $header );
 			$normalized_header = strtolower( $clean_header );
-			
+
 			$headers[ $index ] = array(
-				'original' => $clean_header,
+				'original'   => $clean_header,
 				'normalized' => $normalized_header,
 			);
 		}
 
 		// Check for required headers
-		$found_headers = array_column( $headers, 'normalized' );
+		$found_headers   = array_column( $headers, 'normalized' );
 		$missing_headers = array_diff( $required_headers, $found_headers );
 
 		if ( ! empty( $missing_headers ) ) {
-			throw new \Exception( 
-				sprintf( 
+			throw new \Exception(
+				sprintf(
 					/* translators: %s: comma-separated list of missing headers */
-					__( 'Required CSV headers missing: %s', 'csv-page-generator' ), 
-					implode( ', ', $missing_headers ) 
-				) 
+					__( 'Required CSV headers missing: %s', 'csv-page-generator' ),
+					implode( ', ', $missing_headers )
+				)
 			);
 		}
 
@@ -413,24 +433,24 @@ class Parser {
 
 		// Check file existence
 		if ( ! file_exists( $file_path ) ) {
-			$validation['valid'] = false;
+			$validation['valid']    = false;
 			$validation['errors'][] = __( 'File does not exist.', 'csv-page-generator' );
 			return $validation;
 		}
 
 		// Check file readability
 		if ( ! is_readable( $file_path ) ) {
-			$validation['valid'] = false;
+			$validation['valid']    = false;
 			$validation['errors'][] = __( 'File is not readable.', 'csv-page-generator' );
 			return $validation;
 		}
 
 		// Check file size
 		$file_size = filesize( $file_path );
-		$max_size = $this->settings['max_file_size'] ?? 10485760; // 10MB default
+		$max_size  = $this->settings['max_file_size'] ?? 10485760; // 10MB default
 
 		if ( $file_size > $max_size ) {
-			$validation['valid'] = false;
+			$validation['valid']    = false;
 			$validation['errors'][] = sprintf(
 				/* translators: 1: file size, 2: maximum allowed size */
 				__( 'File size (%1$s) exceeds maximum allowed size (%2$s).', 'csv-page-generator' ),
@@ -450,9 +470,9 @@ class Parser {
 		}
 
 		// Add file info
-		$validation['info']['file_size'] = $file_size;
+		$validation['info']['file_size']      = $file_size;
 		$validation['info']['file_extension'] = $file_extension;
-		$validation['info']['mime_type'] = mime_content_type( $file_path );
+		$validation['info']['mime_type']      = mime_content_type( $file_path );
 
 		return $validation;
 	}

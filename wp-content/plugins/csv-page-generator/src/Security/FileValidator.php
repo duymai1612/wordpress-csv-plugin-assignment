@@ -61,7 +61,7 @@ class FileValidator {
 	 * @param Logger $logger Logger instance.
 	 */
 	public function __construct( Logger $logger ) {
-		$this->logger = $logger;
+		$this->logger   = $logger;
 		$this->settings = get_option( 'csv_page_generator_settings', array() );
 	}
 
@@ -81,7 +81,7 @@ class FileValidator {
 
 		// Basic file validation
 		$basic_validation = $this->validate_basic_file_properties( $uploaded_file );
-		$result = $this->merge_validation_results( $result, $basic_validation );
+		$result           = $this->merge_validation_results( $result, $basic_validation );
 
 		if ( ! $result['valid'] ) {
 			return $result;
@@ -89,7 +89,7 @@ class FileValidator {
 
 		// File type validation
 		$type_validation = $this->validate_file_type( $uploaded_file );
-		$result = $this->merge_validation_results( $result, $type_validation );
+		$result          = $this->merge_validation_results( $result, $type_validation );
 
 		if ( ! $result['valid'] ) {
 			return $result;
@@ -97,7 +97,7 @@ class FileValidator {
 
 		// File size validation
 		$size_validation = $this->validate_file_size( $uploaded_file );
-		$result = $this->merge_validation_results( $result, $size_validation );
+		$result          = $this->merge_validation_results( $result, $size_validation );
 
 		if ( ! $result['valid'] ) {
 			return $result;
@@ -105,18 +105,21 @@ class FileValidator {
 
 		// Content validation
 		$content_validation = $this->validate_file_content( $uploaded_file );
-		$result = $this->merge_validation_results( $result, $content_validation );
+		$result             = $this->merge_validation_results( $result, $content_validation );
 
 		// Security validation
 		$security_validation = $this->validate_file_security( $uploaded_file );
-		$result = $this->merge_validation_results( $result, $security_validation );
+		$result              = $this->merge_validation_results( $result, $security_validation );
 
-		$this->logger->info( 'File validation completed', array(
-			'filename' => $uploaded_file['name'],
-			'valid'    => $result['valid'],
-			'errors'   => count( $result['errors'] ),
-			'warnings' => count( $result['warnings'] ),
-		) );
+		$this->logger->info(
+			'File validation completed',
+			array(
+				'filename' => $uploaded_file['name'],
+				'valid'    => $result['valid'],
+				'errors'   => count( $result['errors'] ),
+				'warnings' => count( $result['warnings'] ),
+			)
+		);
 
 		return $result;
 	}
@@ -137,14 +140,14 @@ class FileValidator {
 
 		// Check if file was uploaded
 		if ( empty( $uploaded_file['tmp_name'] ) || ! is_uploaded_file( $uploaded_file['tmp_name'] ) ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = __( 'File was not properly uploaded.', 'csv-page-generator' );
 			return $result;
 		}
 
 		// Check filename
 		if ( empty( $uploaded_file['name'] ) ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = __( 'Filename is missing.', 'csv-page-generator' );
 			return $result;
 		}
@@ -157,14 +160,14 @@ class FileValidator {
 
 		// Check file exists and is readable
 		if ( ! file_exists( $uploaded_file['tmp_name'] ) || ! is_readable( $uploaded_file['tmp_name'] ) ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = __( 'Uploaded file is not accessible.', 'csv-page-generator' );
 			return $result;
 		}
 
-		$result['info']['original_name'] = $uploaded_file['name'];
+		$result['info']['original_name']  = $uploaded_file['name'];
 		$result['info']['sanitized_name'] = $sanitized_name;
-		$result['info']['tmp_name'] = $uploaded_file['tmp_name'];
+		$result['info']['tmp_name']       = $uploaded_file['tmp_name'];
 
 		return $result;
 	}
@@ -185,9 +188,9 @@ class FileValidator {
 
 		// Check file extension
 		$file_extension = strtolower( pathinfo( $uploaded_file['name'], PATHINFO_EXTENSION ) );
-		
+
 		if ( ! in_array( $file_extension, $this->allowed_extensions, true ) ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = sprintf(
 				/* translators: 1: file extension, 2: allowed extensions */
 				__( 'File extension "%1$s" is not allowed. Allowed extensions: %2$s', 'csv-page-generator' ),
@@ -198,7 +201,7 @@ class FileValidator {
 
 		// Check MIME type
 		$mime_type = $this->get_file_mime_type( $uploaded_file['tmp_name'] );
-		
+
 		if ( ! in_array( $mime_type, $this->allowed_mime_types, true ) ) {
 			$result['warnings'][] = sprintf(
 				/* translators: 1: detected MIME type, 2: allowed MIME types */
@@ -223,10 +226,10 @@ class FileValidator {
 	private function get_file_mime_type( $file_path ) {
 		// Try multiple methods for MIME type detection
 		if ( function_exists( 'finfo_file' ) ) {
-			$finfo = finfo_open( FILEINFO_MIME_TYPE );
+			$finfo     = finfo_open( FILEINFO_MIME_TYPE );
 			$mime_type = finfo_file( $finfo, $file_path );
 			finfo_close( $finfo );
-			
+
 			if ( $mime_type ) {
 				return $mime_type;
 			}
@@ -259,18 +262,18 @@ class FileValidator {
 		);
 
 		$file_size = $uploaded_file['size'];
-		$max_size = $this->settings['max_file_size'] ?? 10485760; // 10MB default
+		$max_size  = $this->settings['max_file_size'] ?? 10485760; // 10MB default
 
 		// Check if file is empty
 		if ( $file_size === 0 ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = __( 'File is empty.', 'csv-page-generator' );
 			return $result;
 		}
 
 		// Check maximum size
 		if ( $file_size > $max_size ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = sprintf(
 				/* translators: 1: file size, 2: maximum allowed size */
 				__( 'File size (%1$s) exceeds maximum allowed size (%2$s).', 'csv-page-generator' ),
@@ -290,7 +293,7 @@ class FileValidator {
 		}
 
 		$result['info']['file_size'] = $file_size;
-		$result['info']['max_size'] = $max_size;
+		$result['info']['max_size']  = $max_size;
 
 		return $result;
 	}
@@ -314,7 +317,7 @@ class FileValidator {
 		// Read first few lines to validate CSV structure
 		$handle = fopen( $file_path, 'r' );
 		if ( ! $handle ) {
-			$result['valid'] = false;
+			$result['valid']    = false;
 			$result['errors'][] = __( 'Cannot read file content.', 'csv-page-generator' );
 			return $result;
 		}
@@ -331,7 +334,7 @@ class FileValidator {
 			// Read header line
 			$header_line = fgets( $handle );
 			if ( ! $header_line ) {
-				$result['valid'] = false;
+				$result['valid']    = false;
 				$result['errors'][] = __( 'File appears to be empty or unreadable.', 'csv-page-generator' );
 				fclose( $handle );
 				return $result;
@@ -339,19 +342,19 @@ class FileValidator {
 
 			// Basic CSV structure validation
 			$header_fields = str_getcsv( $header_line );
-			
+
 			if ( count( $header_fields ) < 2 ) {
-				$result['valid'] = false;
+				$result['valid']    = false;
 				$result['errors'][] = __( 'CSV file must have at least 2 columns (Title and Description).', 'csv-page-generator' );
 			}
 
 			// Check for required headers
 			$normalized_headers = array_map( 'strtolower', array_map( 'trim', $header_fields ) );
-			$required_headers = array( 'title', 'description' );
-			$missing_headers = array_diff( $required_headers, $normalized_headers );
+			$required_headers   = array( 'title', 'description' );
+			$missing_headers    = array_diff( $required_headers, $normalized_headers );
 
 			if ( ! empty( $missing_headers ) ) {
-				$result['valid'] = false;
+				$result['valid']    = false;
 				$result['errors'][] = sprintf(
 					/* translators: %s: comma-separated list of missing headers */
 					__( 'Required CSV headers missing: %s', 'csv-page-generator' ),
@@ -362,10 +365,10 @@ class FileValidator {
 			// Count approximate number of rows
 			$row_count = 0;
 			while ( fgets( $handle ) && $row_count < 1000 ) { // Sample first 1000 rows
-				$row_count++;
+				++$row_count;
 			}
 
-			$result['info']['header_fields'] = $header_fields;
+			$result['info']['header_fields']  = $header_fields;
 			$result['info']['estimated_rows'] = $row_count;
 
 		} finally {
@@ -417,7 +420,7 @@ class FileValidator {
 		}
 
 		// Check for excessively long lines (potential DoS)
-		$lines = explode( "\n", $content );
+		$lines           = explode( "\n", $content );
 		$max_line_length = 10000; // 10KB per line
 
 		foreach ( $lines as $line_number => $line ) {
@@ -437,7 +440,7 @@ class FileValidator {
 		}
 
 		$result['info']['content_length'] = strlen( $content );
-		$result['info']['line_count'] = count( $lines );
+		$result['info']['line_count']     = count( $lines );
 
 		return $result;
 	}

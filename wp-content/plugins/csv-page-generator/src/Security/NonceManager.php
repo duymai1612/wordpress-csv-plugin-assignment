@@ -41,7 +41,7 @@ class NonceManager {
 	 */
 	public function create_nonce( $action, $user_id = null ) {
 		$action = $this->get_prefixed_action( $action );
-		
+
 		if ( $user_id ) {
 			$action .= '_user_' . $user_id;
 		}
@@ -59,7 +59,7 @@ class NonceManager {
 	 */
 	public function verify_nonce( $nonce, $action, $user_id = null ) {
 		$action = $this->get_prefixed_action( $action );
-		
+
 		if ( $user_id ) {
 			$action .= '_user_' . $user_id;
 		}
@@ -90,7 +90,7 @@ class NonceManager {
 	 */
 	public function verify_nonce_field( $action, $name = '_wpnonce' ) {
 		$action = $this->get_prefixed_action( $action );
-		
+
 		if ( ! isset( $_POST[ $name ] ) ) {
 			return false;
 		}
@@ -120,7 +120,7 @@ class NonceManager {
 	 */
 	public function verify_nonce_url( $action, $name = '_wpnonce' ) {
 		$action = $this->get_prefixed_action( $action );
-		
+
 		if ( ! isset( $_GET[ $name ] ) ) {
 			return false;
 		}
@@ -173,14 +173,14 @@ class NonceManager {
 	 */
 	public function verify_ajax_nonce( $action, $query_arg = false, $die = true ) {
 		$action = $this->get_prefixed_action( $action );
-		
+
 		if ( $die ) {
 			return check_ajax_referer( $action, $query_arg, $die );
 		}
 
 		// Manual verification without dying
 		$nonce = '';
-		
+
 		if ( $query_arg && isset( $_REQUEST[ $query_arg ] ) ) {
 			$nonce = sanitize_text_field( wp_unslash( $_REQUEST[ $query_arg ] ) );
 		} elseif ( isset( $_REQUEST['_ajax_nonce'] ) ) {
@@ -214,7 +214,7 @@ class NonceManager {
 	 */
 	public function set_nonce_lifetime( $lifetime ) {
 		$this->lifetime = absint( $lifetime );
-		
+
 		// Use WordPress filter to modify nonce lifetime
 		add_filter( 'nonce_life', array( $this, 'filter_nonce_life' ) );
 	}
@@ -255,14 +255,14 @@ class NonceManager {
 	 */
 	public function create_time_limited_token( $action, $expiry_time = 3600 ) {
 		$data = array(
-			'action' => $action,
-			'expiry' => time() + $expiry_time,
+			'action'  => $action,
+			'expiry'  => time() + $expiry_time,
 			'user_id' => get_current_user_id(),
-			'random' => $this->generate_secure_token( 16 ),
+			'random'  => $this->generate_secure_token( 16 ),
 		);
 
 		$token = base64_encode( wp_json_encode( $data ) );
-		$hash = hash_hmac( 'sha256', $token, wp_salt( 'nonce' ) );
+		$hash  = hash_hmac( 'sha256', $token, wp_salt( 'nonce' ) );
 
 		return $token . '.' . $hash;
 	}
@@ -276,7 +276,7 @@ class NonceManager {
 	 */
 	public function verify_time_limited_token( $token, $action ) {
 		$parts = explode( '.', $token );
-		
+
 		if ( count( $parts ) !== 2 ) {
 			return false;
 		}
@@ -291,7 +291,7 @@ class NonceManager {
 
 		// Decode and verify data
 		$data = json_decode( base64_decode( $data_token ), true );
-		
+
 		if ( ! $data || ! is_array( $data ) ) {
 			return false;
 		}

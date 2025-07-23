@@ -63,10 +63,10 @@ class UploadHandler {
 	 * @param Logger $logger Logger instance.
 	 */
 	public function __construct( Logger $logger ) {
-		$this->logger = $logger;
+		$this->logger         = $logger;
 		$this->file_validator = new FileValidator( $logger );
-		$this->processor = new Processor( $logger );
-		$this->settings = get_option( 'csv_page_generator_settings', array() );
+		$this->processor      = new Processor( $logger );
+		$this->settings       = get_option( 'csv_page_generator_settings', array() );
 		$this->setup_upload_directory();
 	}
 
@@ -74,7 +74,7 @@ class UploadHandler {
 	 * Set up upload directory.
 	 */
 	private function setup_upload_directory() {
-		$wp_upload_dir = wp_upload_dir();
+		$wp_upload_dir    = wp_upload_dir();
 		$this->upload_dir = $wp_upload_dir['basedir'] . '/csv-imports';
 
 		// Ensure directory exists
@@ -128,21 +128,28 @@ class UploadHandler {
 			// Clean up uploaded file
 			$this->cleanup_file( $file_path );
 
-			wp_send_json_success( array(
-				'message'   => __( 'CSV file processed successfully.', 'csv-page-generator' ),
-				'results'   => $results,
-				'import_id' => $results['import_id'],
-			) );
+			wp_send_json_success(
+				array(
+					'message'   => __( 'CSV file processed successfully.', 'csv-page-generator' ),
+					'results'   => $results,
+					'import_id' => $results['import_id'],
+				)
+			);
 
 		} catch ( \Exception $e ) {
-			$this->logger->error( 'CSV upload failed', array(
-				'error' => $e->getMessage(),
-				'user_id' => get_current_user_id(),
-			) );
+			$this->logger->error(
+				'CSV upload failed',
+				array(
+					'error'   => $e->getMessage(),
+					'user_id' => get_current_user_id(),
+				)
+			);
 
-			wp_send_json_error( array(
-				'message' => $e->getMessage(),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => $e->getMessage(),
+				)
+			);
 		}
 	}
 
@@ -154,7 +161,7 @@ class UploadHandler {
 	 * @throws \Exception If file move fails.
 	 */
 	private function move_uploaded_file( array $uploaded_file ) {
-		$filename = $this->generate_secure_filename( $uploaded_file['name'] );
+		$filename  = $this->generate_secure_filename( $uploaded_file['name'] );
 		$file_path = $this->upload_dir . '/' . $filename;
 
 		if ( ! move_uploaded_file( $uploaded_file['tmp_name'], $file_path ) ) {
@@ -164,11 +171,14 @@ class UploadHandler {
 		// Set secure file permissions
 		chmod( $file_path, 0644 );
 
-		$this->logger->info( 'File uploaded successfully', array(
-			'original_name' => $uploaded_file['name'],
-			'secure_name'   => $filename,
-			'file_size'     => $uploaded_file['size'],
-		) );
+		$this->logger->info(
+			'File uploaded successfully',
+			array(
+				'original_name' => $uploaded_file['name'],
+				'secure_name'   => $filename,
+				'file_size'     => $uploaded_file['size'],
+			)
+		);
 
 		return $file_path;
 	}
@@ -180,9 +190,9 @@ class UploadHandler {
 	 * @return string Secure filename.
 	 */
 	private function generate_secure_filename( $original_name ) {
-		$info = pathinfo( $original_name );
+		$info      = pathinfo( $original_name );
 		$extension = strtolower( $info['extension'] ?? '' );
-		
+
 		// Ensure CSV extension
 		if ( 'csv' !== $extension ) {
 			$extension = 'csv';
@@ -190,9 +200,9 @@ class UploadHandler {
 
 		// Generate unique filename
 		$timestamp = time();
-		$user_id = get_current_user_id();
-		$random = wp_generate_password( 8, false );
-		
+		$user_id   = get_current_user_id();
+		$random    = wp_generate_password( 8, false );
+
 		return sprintf( 'csv_%d_%d_%s.%s', $user_id, $timestamp, $random, $extension );
 	}
 
@@ -203,10 +213,10 @@ class UploadHandler {
 	 */
 	private function get_processing_options() {
 		$options = array(
-			'original_filename' => sanitize_file_name( $_FILES['csv_file']['name'] ?? '' ),
-			'post_status'       => sanitize_text_field( $_POST['post_status'] ?? 'draft' ),
-			'post_author'       => absint( $_POST['post_author'] ?? get_current_user_id() ),
-			'skip_errors'       => true,
+			'original_filename'  => sanitize_file_name( $_FILES['csv_file']['name'] ?? '' ),
+			'post_status'        => sanitize_text_field( $_POST['post_status'] ?? 'draft' ),
+			'post_author'        => absint( $_POST['post_author'] ?? get_current_user_id() ),
+			'skip_errors'        => true,
 			'send_notifications' => $this->settings['enable_notifications'] ?? false,
 		);
 
@@ -346,14 +356,18 @@ class UploadHandler {
 				throw new \Exception( __( 'Import not found.', 'csv-page-generator' ) );
 			}
 
-			wp_send_json_success( array(
-				'progress' => $progress,
-			) );
+			wp_send_json_success(
+				array(
+					'progress' => $progress,
+				)
+			);
 
 		} catch ( \Exception $e ) {
-			wp_send_json_error( array(
-				'message' => $e->getMessage(),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => $e->getMessage(),
+				)
+			);
 		}
 	}
 
@@ -380,17 +394,20 @@ class UploadHandler {
 			$success = $this->processor->cancel_import( $import_id );
 
 			if ( $success ) {
-				wp_send_json_success( array(
-					'message' => __( 'Import cancelled successfully.', 'csv-page-generator' ),
-				) );
+				wp_send_json_success(
+					array(
+						'message' => __( 'Import cancelled successfully.', 'csv-page-generator' ),
+					)
+				);
 			} else {
 				throw new \Exception( __( 'Failed to cancel import.', 'csv-page-generator' ) );
 			}
-
 		} catch ( \Exception $e ) {
-			wp_send_json_error( array(
-				'message' => $e->getMessage(),
-			) );
+			wp_send_json_error(
+				array(
+					'message' => $e->getMessage(),
+				)
+			);
 		}
 	}
 
@@ -402,7 +419,7 @@ class UploadHandler {
 	public function get_max_upload_size() {
 		$max_upload = wp_max_upload_size();
 		$plugin_max = $this->settings['max_file_size'] ?? 10485760; // 10MB default
-		
+
 		return min( $max_upload, $plugin_max );
 	}
 
@@ -413,10 +430,10 @@ class UploadHandler {
 	 */
 	public function get_upload_info() {
 		return array(
-			'upload_dir'     => $this->upload_dir,
-			'max_file_size'  => $this->get_max_upload_size(),
-			'allowed_types'  => array( 'csv' ),
-			'is_writable'    => is_writable( $this->upload_dir ),
+			'upload_dir'    => $this->upload_dir,
+			'max_file_size' => $this->get_max_upload_size(),
+			'allowed_types' => array( 'csv' ),
+			'is_writable'   => is_writable( $this->upload_dir ),
 		);
 	}
 }
