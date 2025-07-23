@@ -539,7 +539,37 @@ ddev describe
 ddev restart
 ```
 
-### Common Issue 8: Docker vmnetd Error (macOS)
+### Common Issue 8: Admin Interface Assets Not Loading
+
+**Symptoms:**
+- CSV upload page loads but has no styling
+- JavaScript functionality not working (no drag/drop, progress bars)
+- Browser console shows 404 errors for admin.js or admin.css files
+
+**Root Cause:**
+Asset files were configured to load from `assets/dist/` but actual files are in `assets/js/` and `assets/css/`.
+
+**Solution:**
+This has been fixed in the current version. If you encounter this issue:
+```bash
+# Verify asset files exist
+ddev exec ls -la wp-content/plugins/csv-page-generator/assets/css/admin.css
+ddev exec ls -la wp-content/plugins/csv-page-generator/assets/js/admin.js
+
+# If missing, update to latest version
+git pull origin main
+
+# Check if assets are being enqueued correctly
+ddev wp eval "
+global \$wp_scripts, \$wp_styles;
+echo 'Scripts: ';
+print_r(array_keys(\$wp_scripts->registered));
+echo 'Styles: ';
+print_r(array_keys(\$wp_styles->registered));
+"
+```
+
+### Common Issue 9: Docker vmnetd Error (macOS)
 
 **Symptoms:**
 - Error: `failed to connect to /var/run/com.docker.vmnetd.sock`
@@ -649,6 +679,35 @@ ddev wp post list --post_type=page --meta_key=_csv_page_generator_source --forma
 - Page generation: All valid rows create WordPress pages
 - Import tracking: Database records created with correct statistics
 - No critical errors in logs: Only expected warnings for test data
+
+## Recent Fixes Applied
+
+The following issues have been identified and resolved:
+
+### ✅ **Asset Loading Fixed**
+- **Issue**: Admin CSS and JavaScript files were not loading (404 errors)
+- **Cause**: File paths pointed to non-existent `assets/dist/` directory
+- **Fix**: Updated paths to correct `assets/js/` and `assets/css/` locations
+- **Result**: Admin interface now has proper styling and JavaScript functionality
+
+### ✅ **AJAX Upload Security Fixed**
+- **Issue**: CSV upload failed with "Security verification failed" error
+- **Cause**: Nonce field name mismatch between form and validation
+- **Fix**: Updated UploadHandler to use correct nonce field name (`csv_upload_nonce`)
+- **Result**: File uploads now pass security validation
+
+### ✅ **Plugin Deactivation Fixed**
+- **Issue**: Plugin deactivation failed with namespace error
+- **Cause**: Missing global namespace prefix for WordPress function
+- **Fix**: Added `\` prefix to `wp_get_scheduled_events()` call
+- **Result**: Plugin can be safely activated/deactivated
+
+### ✅ **Admin Interface Fully Functional**
+- All admin hooks properly registered
+- AJAX endpoints working correctly
+- Menu items appear in WordPress admin
+- File upload form renders with proper styling
+- Progress indicators and error handling implemented
 
 ## Verified Test Results
 
