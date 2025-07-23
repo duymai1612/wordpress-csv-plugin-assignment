@@ -539,6 +539,56 @@ ddev describe
 ddev restart
 ```
 
+### Common Issue 8: Docker vmnetd Error (macOS)
+
+**Symptoms:**
+- Error: `failed to connect to /var/run/com.docker.vmnetd.sock`
+- DDEV router fails to start
+- Port binding failures on 127.0.0.1:80 or 127.0.0.1:443
+
+**Root Cause:**
+Docker Desktop's vmnetd networking service is not running or accessible on macOS.
+
+**Primary Solution:**
+```bash
+# 1. Restart Docker Desktop
+osascript -e 'quit app "Docker Desktop"'
+sleep 10
+open -a "Docker Desktop"
+sleep 30
+
+# 2. Stop and restart DDEV
+ddev stop
+ddev start
+```
+
+**Alternative Solution (if primary fails):**
+```bash
+# Use alternative ports to avoid vmnetd conflicts
+ddev config --router-http-port=8080 --router-https-port=8443
+ddev start
+
+# Update WordPress URLs to match new ports
+ddev wp option update siteurl "http://wordpress-csv-plugin.ddev.site:8080"
+ddev wp option update home "http://wordpress-csv-plugin.ddev.site:8080"
+
+# Access site at: http://wordpress-csv-plugin.ddev.site:8080
+```
+
+**Additional macOS-specific fixes:**
+```bash
+# Reset Docker Desktop networking
+docker system prune -f
+docker network prune -f
+
+# Check for port conflicts
+sudo lsof -i :80
+sudo lsof -i :443
+
+# If needed, kill conflicting processes
+sudo pkill -f vmnetd
+```
+
 ## Advanced Testing
 
 ### Performance Testing
